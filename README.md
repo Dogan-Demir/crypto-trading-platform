@@ -4,21 +4,24 @@ A simple **crypto trading platform prototype** using **React + Vite**.
 
 ## 📦 Installation
 
-1. **Clone the repository** 🛠️  
+1. **Clone the repository** 🛠️
+   
    ```sh
-  
-
+   git clone https://github.com/Dogan-Demir/crypto-trading-platform.git
 
 3. Navigate to the project folder 📂 :
-  
+   
+   ```sh
    cd crypto-trading-platform
 
 3. Install dependencies  📥 :
-  
+   
+   ```sh
    npm install
 
 6. Start the development server ▶️ :
-  
+   
+   ```sh
    npm run dev
 
 
