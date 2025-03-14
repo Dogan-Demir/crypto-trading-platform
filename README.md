@@ -31,3 +31,6 @@ A simple **crypto trading platform prototype** using **React + Vite**.
 2. 🌿 Create a new branch.
 3. 💻 Make your changes and commit.
 4. 🚀 Push the changes and open a pull request.
+
+test test test
+
