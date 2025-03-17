@@ -1,6 +1,6 @@
-import React from "react";
-import { useState } from "react";
-import "./CSS/Login.css";
+import bgImage from "./assets/Background-blur.png";
+
+import React, { useState } from "react";
 
 export default function Login() {
     const [username, setUsername] = useState("");
@@ -17,16 +17,33 @@ export default function Login() {
     }
 
     return (
-        <>
-          <img src="./assets/logoName.png" alt="logo" className="logo"/>
-          <form onSubmit={handleForm} className="login-form">
-            <p className="p1">Welcome back!</p>
-            <input type="text" placeholder="Enter username" className="username-bar" onChange={(e)=>setUsername(e.target.value.trim())}/>
-            <input type="password" placeholder="Enter password" className='password-bar' onChange={(e)=>setPassword(e.target.value.trim())}/>
-            <a href="#" className="forgot-btn">Forgot password?</a>
-            <button type="submit" className="sign-in">SIGN IN</button>
-            <p className="p2">Don't have an account? <a href="#">Sign up</a></p>
-          </form>
-        </>
-    )
+        <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat" style={{ backgroundImage: `url(${bgImage})` }}>
+            <div className="relative">
+                <img src="./assets/logoName.png" alt="logo" className="absolute top-0 left-0" />
+            </div>
+            <form onSubmit={handleForm} className="flex flex-col items-center justify-center w-[623px] h-[623px] border border-black rounded-lg bg-gradient-to-b from-[rgba(14,27,71,0.8)] to-[rgba(33,66,173,0.8)] backdrop-blur-sm opacity-90 p-6">
+                <p className="text-white text-[60px] font-medium mb-9 mt-14">Welcome back!</p>
+                <input 
+                    type="text" 
+                    placeholder="Enter username" 
+                    className="w-[409px] h-[48px] rounded-lg text-[25px] font-medium px-4 mb-9" 
+                    onChange={(e) => setUsername(e.target.value.trim())} 
+                />
+                <input 
+                    type="password" 
+                    placeholder="Enter password" 
+                    className="w-[409px] h-[48px] rounded-lg text-[25px] font-medium px-4 mb-9" 
+                    onChange={(e) => setPassword(e.target.value.trim())} 
+                />
+                <a href="#" className="flex justify-center items-center w-[301px] h-[61px] rounded-full bg-[#091267] border border-white text-white font-bold text-[25px] mb-6">Forgot password?</a>
+                <button 
+                    type="submit" 
+                    className="flex justify-center items-center w-[159px] h-[61px] rounded-full bg-gradient-to-r from-[#2011BA] to-[#57D2FF] text-white font-bold text-[25px] mb-12"
+                >SIGN IN</button>
+                <p className="text-white text-[20px] font-normal">
+                    Don't have an account? <a href="#" className="underline">Sign up</a>
+                </p>
+            </form>
+        </div>
+    );
 }
