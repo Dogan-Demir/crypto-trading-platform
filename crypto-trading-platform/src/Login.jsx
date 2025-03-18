@@ -1,4 +1,5 @@
 import bgImage from "./assets/Background-blur.png";
+import logo from "./assets/logoName.png";
 import {Link} from "react-router-dom";
 import React, { useState } from "react";
 
@@ -17,10 +18,11 @@ export default function Login() {
     }
 
     return (
+        <>
+        <div className="fixed top-5 left-5 right-5 z-10 px-4 py-2 text-amber-50">
+        <img src={logo} alt="logo" className="h-8 mr-2" />
+        </div>
         <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat" style={{ backgroundImage: `url(${bgImage})` }}>
-            <div className="relative">
-                <img src="./assets/logoName.png" alt="logo" className="absolute top-0 left-0" />
-            </div>
             <form onSubmit={handleForm} className="flex flex-col items-center justify-center w-[623px] h-[623px] border border-black rounded-lg bg-gradient-to-b from-[rgba(14,27,71,0.8)] to-[rgba(33,66,173,0.8)] backdrop-blur-sm opacity-90 p-6">
                 <p className="text-white text-[60px] font-medium mb-9 mt-14">Welcome back!</p>
                 <input 
@@ -47,5 +49,6 @@ export default function Login() {
                 </p>
             </form>
         </div>
+        </>
     );
 }

@@ -1,5 +1,6 @@
 import React from "react";
 import bgImage from "./assets/Background-blur.png";
+import logo from './assets/logoName.png';
 import { useState } from "react";
 import {Link} from "react-router-dom";
 
@@ -35,6 +36,10 @@ export default function SignUp() {
     };
 
     return (
+        <>
+        <div className="fixed top-5 left-5 right-5 z-10 px-4 py-2 text-amber-50">
+            <img src={logo} alt="logo" className="h-8 mr-2" />
+        </div>
         <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat" style={{ backgroundImage: `url(${bgImage})` }}>
             <div className="relative">
                 <img src="./assets/logoName.png" alt="logo" className="absolute top-0 left-0" />
@@ -75,5 +80,6 @@ export default function SignUp() {
                 </p>
             </form>
         </div>
+        </>
     )
 }
