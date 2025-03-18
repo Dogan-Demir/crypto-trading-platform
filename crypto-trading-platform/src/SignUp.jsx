@@ -1,6 +1,7 @@
 import React from "react";
 import bgImage from "./assets/Background-blur.png";
 import { useState } from "react";
+import {Link} from "react-router-dom";
 
 export default function SignUp() {
     const [email, setEmail] = useState("")
@@ -14,6 +15,10 @@ export default function SignUp() {
         
         if (!username || !password|| !email) {
             alert("Please fill in all fields.");
+            return;
+        }
+        if (password.length<8){
+            alert("Password must be 8 or more characters")
             return;
         }
         if (password !== confirmPassword) {
@@ -66,7 +71,7 @@ export default function SignUp() {
                     className="flex justify-center items-center w-[159px] h-[61px] rounded-full bg-gradient-to-r from-[#2011BA] to-[#57D2FF] text-white font-bold text-[25px] mb-5"
                 >SIGN UP</button>
                 <p className="text-white text-[15px] font-normal">
-                    Already a member? <a href="#" className="underline">Sign in</a>
+                    Already a member? <Link to="/login"><a href="#" className="underline">Sign in</a></Link>
                 </p>
             </form>
         </div>
