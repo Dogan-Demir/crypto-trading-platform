@@ -1,16 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import bgImage from "./assets/Background-blur.png";
-import { useState } from "react";
 
 export default function SignUp() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [email, setEmail] = useState(""); // New email state
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
-    const handleForm = (e) => {
+    const handleForm = async (e) => {
         e.preventDefault();
 
-        if (!username || !password) {
+        // Validation
+        if (!username || !password || !confirmPassword || !email) {
             alert("Please fill in all fields.");
             return;
         }
@@ -18,8 +21,40 @@ export default function SignUp() {
             alert("Passwords do not match.");
             return;
         }
-        console.log("Logging in...");
-    }
+
+        // Create the user object to send to the backend
+        const user = {
+            username,
+            email,
+            password,
+            password2: confirmPassword, // For password confirmation in the backend
+            // New email field
+        };
+
+        // Make the POST request to the backend signup API
+        try {
+            const response = await fetch("http://127.0.0.1:8000/signup/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(user),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSuccess("User created successfully!");
+                setError(""); // Clear previous errors
+            } else {
+                setError(data.detail || "Something went wrong.");
+                setSuccess(""); // Clear previous success message
+            }
+        } catch (err) {
+            setError("Error connecting to the server.");
+            setSuccess(""); // Clear previous success message
+        }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat" style={{ backgroundImage: `url(${bgImage})` }}>
@@ -33,6 +68,12 @@ export default function SignUp() {
                     placeholder="Enter username"
                     className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] font-medium px-4 mb-9"
                     onChange={(e) => setUsername(e.target.value.trim())}
+                />
+                <input
+                    type="email"
+                    placeholder="Enter email"
+                    className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] font-medium px-4 mb-9"
+                    onChange={(e) => setEmail(e.target.value.trim())}
                 />
                 <input
                     type="password"
@@ -54,7 +95,11 @@ export default function SignUp() {
                 <p className="text-white text-[20px] font-normal">
                     Already a member? <a href="#" className="no-underline">SIGN IN</a>
                 </p>
+
+                {/* Displaying success or error message */}
+                {error && <p className="text-red-500">{error}</p>}
+                {success && <p className="text-green-500">{success}</p>}
             </form>
         </div>
-    )
+    );
 }

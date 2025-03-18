@@ -1,4 +1,4 @@
-#!/Users/dogan/Desktop/school/software-engineering-project/crypto-trading-platform/mybackend/venv/bin/python3.12
+#!/Users/dogan/Desktop/school/software-engineering-project/crypto-trading-platform/mybackend/venv/bin/python3.13
 # -*- coding: utf-8 -*-
 import re
 import sys
