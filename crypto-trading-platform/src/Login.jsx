@@ -26,20 +26,22 @@ export default function Login() {
                 <input 
                     type="text" 
                     placeholder="Enter username" 
-                    className="w-[409px] h-[48px] rounded-lg text-[25px] font-medium px-4 mb-9" 
+                    className="w-[409px] h-[48px] rounded-lg text-[25px] font-medium-small px-4 mb-9 bg-white border-2 border-gray-500" 
                     onChange={(e) => setUsername(e.target.value.trim())} 
                 />
                 <input 
                     type="password" 
                     placeholder="Enter password" 
-                    className="w-[409px] h-[48px] rounded-lg text-[25px] font-medium px-4 mb-9" 
+                    className="w-[409px] h-[48px] rounded-lg text-[25px] font-medium-small px-4 mb-9 bg-white border-2 border-gray-500" 
                     onChange={(e) => setPassword(e.target.value.trim())} 
                 />
-                <a href="#" className="flex justify-center items-center w-[301px] h-[61px] rounded-full bg-[#091267] border border-white text-white font-bold text-[25px] mb-6">Forgot password?</a>
                 <button 
                     type="submit" 
                     className="flex justify-center items-center w-[159px] h-[61px] rounded-full bg-gradient-to-r from-[#2011BA] to-[#57D2FF] text-white font-bold text-[25px] mb-12"
                 >SIGN IN</button>
+                <p className="text-white text-[20px] font-normal">
+                    <a href = "#" className="underline">Forgot Username or Password?</a>
+                </p>
                 <p className="text-white text-[20px] font-normal">
                     Don't have an account? <a href="#" className="underline">Sign up</a>
                 </p>
