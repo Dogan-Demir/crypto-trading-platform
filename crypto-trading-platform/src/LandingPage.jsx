@@ -1,3 +1,4 @@
+import {Link} from "react-router-dom";
 import bgImage from "./assets/Background-blur.png";
 import Navbar from "./Navbar";
 
@@ -20,8 +21,8 @@ function LandingPage() {
 
                 {/* Buttons */}
                 <div className="flex space-x-4 mt-8">
-                    <button className="px-6 py-3 text-white border border-white rounded-full bg-[#091267] hover:bg-[#0a1b4c] transition duration-300">Login</button>
-                    <button className="px-6 py-3 text-white rounded-full bg-gradient-to-r from-[#2011BA] to-[#57D2FF] hover:from-[#3b2ee0] hover:to-[#3fd2f1] transition duration-300">Signup</button>
+                <Link to="/login"><button className="px-6 py-3 text-white border border-white rounded-full bg-[#091267] hover:bg-[#0a1b4c] transition duration-300">login</button></Link>
+                <Link to="/signup"><button className="px-6 py-3 text-white rounded-full bg-gradient-to-r from-[#2011BA] to-[#57D2FF] hover:from-[#3b2ee0] hover:to-[#3fd2f1] transition duration-300">Sign up</button></Link>
 
                 </div>
             </div>
