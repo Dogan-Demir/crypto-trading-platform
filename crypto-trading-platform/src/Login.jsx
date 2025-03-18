@@ -1,5 +1,5 @@
 import bgImage from "./assets/Background-blur.png";
-
+import {Link} from "react-router-dom";
 import React, { useState } from "react";
 
 export default function Login() {
@@ -43,7 +43,7 @@ export default function Login() {
                     <a href = "#" className="underline">Forgot Username or Password?</a>
                 </p>
                 <p className="text-white text-[20px] font-normal">
-                    Don't have an account? <a href="#" className="underline">Sign up</a>
+                    Don't have an account? <Link to="/signup"><a href="#" className="underline">Sign up</a></Link>
                 </p>
             </form>
         </div>
