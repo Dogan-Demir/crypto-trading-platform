@@ -1,4 +1,4 @@
-import lgimg from "./assets/logo.png";
+import lgimg from "./assets/logoName.png";
 
 function Navbar() {
     return (
@@ -6,7 +6,6 @@ function Navbar() {
             <nav className="flex justify-between items-center">
                 <div className="flex items-center">
                     <img src={lgimg} alt="Logo" className="h-8 mr-2" />
-                    <h2 className="text-xl font-bold">CRYPTX</h2>
                 </div>
                 <div>
                     <ul className="flex items-center space-x-6">
