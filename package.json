@@ -1,0 +1,28 @@
+{
+  "name": "crypto-trading-platform",
+  "version": "1.0.0",
+  "description": "A simple **crypto trading platform prototype** using **React + Vite**.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dogan-Demir/crypto-trading-platform.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dogan-Demir/crypto-trading-platform/issues"
+  },
+  "homepage": "https://github.com/Dogan-Demir/crypto-trading-platform#readme",
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/roboto": "^5.2.5",
+    "@mui/icons-material": "^6.4.7",
+    "@mui/material": "^6.4.7",
+    "vite": "^6.2.2"
+  }
+}
