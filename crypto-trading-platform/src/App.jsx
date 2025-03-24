@@ -4,10 +4,15 @@ import Login from "./Login"
 import SignUp from "./SignUp"
 import Account from "./Account";
 import Portfolio from "./Portfolio";
+import Transaction from "./Transaction";
 import Resources from "./Resources";
 import FAQs from "./FAQs";
 import Orders from "./Orders";
 import Settings from "./Settings";
+import FAQs2 from "./FAQsNonMember";
+import Forum from "./Forum";
+import ResourcesNonMember from "./ResourcesNonMember";
+import PriceHistory from "./PriceHistory";
 
 function App() {
   return (
@@ -17,10 +22,15 @@ function App() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/Account" element={<Account />} />
       <Route path="/Portfolio" element={<Portfolio />} />
+      <Route path="/Transaction" element={<Transaction />} />
       <Route path="/Resources" element={<Resources />} />
       <Route path="/FAQs" element={<FAQs />} />
       <Route path="/Orders" element={<Orders />} />
       <Route path="/Settings" element={<Settings />} />
+      <Route path='/FAQsNonMember' element={<FAQs2 />} />
+      <Route path='/Forum' element={<Forum />} />
+      <Route path='/ResourcesNonMember' element={<ResourcesNonMember />} />
+      <Route path='/PriceHistory' element={<PriceHistory />} />
     </Routes>
   );
 }
