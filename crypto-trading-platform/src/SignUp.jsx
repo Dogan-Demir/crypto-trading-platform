@@ -1,20 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import bgImage from "./assets/Background-blur.png";
+
+
 import logo from './assets/logoName.png';
 import { useState } from "react";
 import {Link} from "react-router-dom";
+
 
 export default function SignUp() {
     const [email, setEmail] = useState("")
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [email, setEmail] = useState(""); // New email state
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
-    const handleForm = (e) => {
+    const handleForm = async (e) => {
         e.preventDefault();
-        
-        
-        if (!username || !password|| !email) {
+
+
+        // Validation
+        if (!username || !password || !confirmPassword || !email) {
+
             alert("Please fill in all fields.");
             return;
         }
@@ -26,13 +34,41 @@ export default function SignUp() {
             alert("Passwords do not match.");
             return;
         }
-        const hasNumber = /\d/;
-        
-        if (!hasNumber.test(password) || password==password.toLowerCase()){
-            alert("Please have at least 1 uppercase letter and 1 number");
-            return; 
+
+
+        // Create the user object to send to the backend
+        const user = {
+            username,
+            email,
+            password,
+            password2: confirmPassword, // For password confirmation in the backend
+            // New email field
+        };
+
+        // Make the POST request to the backend signup API
+        try {
+            const response = await fetch("http://127.0.0.1:8000/signup/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(user),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSuccess("User created successfully!");
+                setError(""); // Clear previous errors
+            } else {
+                setError(data.detail || "Something went wrong.");
+                setSuccess(""); // Clear previous success message
+            }
+        } catch (err) {
+            setError("Error connecting to the server.");
+            setSuccess(""); // Clear previous success message
         }
-        console.log("Logging in...");
+
     };
 
     return (
@@ -59,6 +95,12 @@ export default function SignUp() {
                     onChange={(e) => setUsername(e.target.value.trim())}
                 />
                 <input
+                    type="email"
+                    placeholder="Enter email"
+                    className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] font-medium px-4 mb-9"
+                    onChange={(e) => setEmail(e.target.value.trim())}
+                />
+                <input
                     type="password"
                     placeholder="Enter password"
                     className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] font-medium-small px-4 mb-9 border-2 border-gray-500"
@@ -78,8 +120,13 @@ export default function SignUp() {
                 <p className="text-white text-[15px] font-normal">
                     Already a member? <Link to="/login"><a href="#" className="underline">Sign in</a></Link>
                 </p>
+
+                {/* Displaying success or error message */}
+                {error && <p className="text-red-500">{error}</p>}
+                {success && <p className="text-green-500">{success}</p>}
             </form>
         </div>
-        </>
-    )
+
+    );
 }
+
