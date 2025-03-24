@@ -1,10 +1,10 @@
 import React from "react";
 import { useState } from "react";
-import NavBar2 from "./NavBar2";
-import bgImage from "./assets/Background-dark.png";
+import NavBar from "./Navbar";
+import bgImage from "./assets/Background-long.png";
 import icon from './assets/FAQ-plus-symbol.png'
 
-export default function Resources() {
+export default function ResourcesNonMember() {
     const [showResource, setShowResource] = useState({});
 
     const toggleResource = (index) => {
@@ -16,8 +16,8 @@ export default function Resources() {
 
     return(
         <div className="overflow-hidden h-screen flex">
-          <NavBar2/>
-          <div className="flex-1 overflow-y-scroll bg-no-repeat bg-cover ml-[398px] text-white" style={{ background: `url(${bgImage})` }}>
+            <NavBar/>
+          <div className="flex-1 overflow-y-scroll text-white" style={{ background: `url(${bgImage})`, backgroundSize: "cover", backgroundRepeat: "no-repeat" }}>
             <h1 className="text-[40px] mt-[100px] ml-[53px]">Resources</h1>
             {[...Array(5)].map((_, index) => (
                 <div key={index} className={`grid ${showResource[index] ? "h-[325px]":"h-[100px]"} w-[933px] grid-rows-[85px_auto] border rounded-3xl mt-[23px] ml-[53px]`}>
@@ -48,5 +48,4 @@ export default function Resources() {
             ))}
           </div>
         </div>
-    )
-}
+    )}

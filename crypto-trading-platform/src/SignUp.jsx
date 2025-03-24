@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import bgImage from "./assets/Background-blur.png";
-
-
 import logo from './assets/logoName.png';
-import { useState } from "react";
 import {Link} from "react-router-dom";
 
 
@@ -12,7 +9,6 @@ export default function SignUp() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [email, setEmail] = useState(""); // New email state
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
@@ -74,7 +70,7 @@ export default function SignUp() {
     return (
         <>
         <div className="fixed top-5 left-5 right-5 z-10 px-4 py-2 text-amber-50">
-            <img src={logo} alt="logo" className="h-8 mr-2" />
+            <Link to='/'><img src={logo} alt="logo" className="h-8 mr-2" /></Link>
         </div>
         <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat" style={{ backgroundImage: `url(${bgImage})` }}>
             <div className="relative">
@@ -126,7 +122,7 @@ export default function SignUp() {
                 {success && <p className="text-green-500">{success}</p>}
             </form>
         </div>
-
+        </>
     );
 }
 
