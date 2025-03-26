@@ -10,7 +10,7 @@ def validate_password(value):
         raise ValidationError("Password must contain at least one digit.")
     if not any(char.isalpha() for char in value):
         raise ValidationError("Password must contain at least one letter.")
-    if not any(char in "!@#$%^&*()-_=+" for char in value):
+    if not any(char in "?!@#$%^&*()-_=+" for char in value):
         raise ValidationError("Password must contain at least one special character.")
     return value
 
