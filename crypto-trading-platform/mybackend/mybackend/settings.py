@@ -37,10 +37,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
+    
+    #The apps created for the project
     'auth_app',
     'API_logic',
-    'rest_framework'
+
+    #Third party
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
