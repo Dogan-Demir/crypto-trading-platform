@@ -1,7 +1,6 @@
 
 from rest_framework import generics
 from .serializers import SignupSerializer
-
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -19,4 +18,4 @@ class SignUpView(generics.GenericAPIView):
 from django.http import HttpResponse
 
 def index(request):
-    return HttpResponse("Welcome to the crypto trading platform!")
+    return HttpResponse("Welcome to the aaa trading platform!")
