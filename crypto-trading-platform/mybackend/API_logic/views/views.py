@@ -86,8 +86,8 @@ class BuyCryptoView(APIView):
             )
 
             #Confirmation message
-            serialized_trade = TradeSerializer(trade)
-            return Response({"message": "Buy order placed", "trade" : serialized_trade.data}, status=201)
+            trade_data = TradeSerializer(trade).data
+            return Response({"message": "Buy order placed", "trade" : trade_data}, status=201)
         
         return Response(serializer.errors, status=400)
 
@@ -124,8 +124,8 @@ class SellCryptoView(APIView):
             )
 
             #Confirmation message
-            serialized_trade = TradeSerializer(trade)
-            return Response({"message": "Sell order placed", "trade" : serialized_trade.data}, status=201)
+            trade_data = TradeSerializer(trade).data
+            return Response({"message": "Sell order placed", "trade" : trade_data}, status=201)
         return Response(serializer.errors, status=400)
     
 #This class handles the request to get the trade history
