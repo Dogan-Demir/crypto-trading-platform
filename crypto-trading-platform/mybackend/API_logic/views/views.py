@@ -62,7 +62,7 @@ class BuyCryptoView(APIView):
         serializer = TradeRequestSerializer(data = request.data)
         if serializer.is_valid():
             #Using a custom serializer to validate the incoming data
-            coin = serializer.validated_data['cryptocurrency']
+            coin = serializer.validated_data['currency']
             amount = serializer.validated_data['amount']
             #Once data is validated it is extracted
             url = f"https://api.exchange.coinbase.com/products/{coin}-USD/ticker"
@@ -98,7 +98,7 @@ class SellCryptoView(APIView):
         serializer = TradeRequestSerializer(data = request.data)
         if serializer.is_valid():
             #Using a custom serializer to validate the incoming data
-            coin = serializer.validated_data['cryptocurrency']
+            coin = serializer.validated_data['currency']
             amount = serializer.validated_data['amount']
 
             #Once data is validated it is extracted

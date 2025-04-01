@@ -3,7 +3,7 @@ from .models import Deposit, Withdrawal, Trade # it imports the models
 
 
 class TradeRequestSerializer(serializers.Serializer):
-    cryptocurrency = serializers.CharField()
+    currency = serializers.CharField()
     amount = serializers.FloatField()
 
 class DepositSerializer(serializers.ModelSerializer): # the serializer for the deposit model
