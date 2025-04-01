@@ -1,5 +1,6 @@
 from rest_framework import serializers 
-from .models import Deposit, Withdrawal # it imports the Deposit and Withdrawal models
+from .models import Deposit, Withdrawal, Trade # it imports the models
+
 
 class TradeRequestSerializer(serializers.Serializer):
     cryptocurrency = serializers.CharField()
@@ -16,3 +17,8 @@ class WithdrawalSerializer(serializers.ModelSerializer): # serializer for the wi
     class Meta:
         model = Withdrawal # based on withdrawal model
         fields = ['amount', 'currency', 'destination_address']
+
+class TradeSerializer(serializers.ModelSerializer): # serializer for the trade model
+    class Meta:
+        model = Trade
+        fields = '__all__'

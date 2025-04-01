@@ -1,5 +1,5 @@
 from django.db import models 
-from django.contrib.auth.models import User # impots the User model from Django
+from django.contrib.auth.models import User # imports the User model from Django
 
 class Deposit(models.Model): # this is the database model for storing info on deposits
 # columns in the db table
@@ -25,4 +25,15 @@ class Withdrawal(models.Model): # withdrawal db model
     def __str__(self):
         return f"{self.user.username} withdrew {self.amount} {self.currency} to {self.destination_address}" # returns string of user, how much they withdrew and to where
 
+class Trade(models.Model):
+    TRADE_TYPES = (("BUY", "Buy"), ("SELL", "Sell")) # this is a tuple of the trade types
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # foreign key to user model
+    currency = models.CharField(max_length=10)
+    amount = models.DecimalField(max_digits=12, decimal_places=2) 
+    price_at_trade = models.DecimalField(max_digits=12, decimal_places=2) # the price at which the trade was made
+    trade_type = models.CharField(max_length=4, choices=TRADE_TYPES) # the type of trade (buy/sell)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} {self.trade_type} {self.amount} {self.currency} at {self.price_at_trade}"

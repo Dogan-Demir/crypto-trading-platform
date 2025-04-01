@@ -1,25 +1,34 @@
 import requests
 #Python HTTP library for making requests to APIs
+
 from rest_framework.views import APIView
-#
+#Django REST framework view for handling API requests
+
 from rest_framework.response import Response
 #Instead of returning raw HTTPResponse this gives a clean way to return JSON with status codes
+
 from rest_framework import status
 #Uses readable constants for HTTP status codes
 #200 represents ok
 #400 represents bad request
 #500 represents internal server error
 #201 represents created
+
 from ..serializers import TradeRequestSerializer
-##This is a serializer that will be used to validate the incoming data for the buy and sell requests
+#This is a serializer that will be used to validate the incoming data for the buy and sell requests
 #It will check if the data is in the correct format and return errors if not
 
-#This simulates the database for storing trades
-#Will be changed later
-trades = []
+from ..serializers import TradeSerializer
+#Thi is a serializer that will be used to serialize the trade data for the response
+#It will convert the trade data into JSON format for the response
+
+from ..models import Trade
+#This is a model that will be used to store the trade data in the database
+
+from django.contrib.auth.models import User #TEST - imports the User model for testing purposes (will be removed later)
 
 #This class handles the request to get all available trading pairs from the Coinbase API
-class getCoinPairs(APIView):
+class getCoinPairsView(APIView):
     def get(self,request):
         try:
             url = "https://api.exchange.coinbase.com/products"
@@ -32,7 +41,7 @@ class getCoinPairs(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #This class handles the request to get the price of a specific trading pair from the Coinbase API
-class getCoinPrice(APIView):
+class getCoinPriceView(APIView):
     def get(self,request,coin,quote_currency):
         try:
             url = f"https://api.exchange.coinbase.com/products/{coin}-{quote_currency}/ticker"
@@ -48,7 +57,7 @@ class getCoinPrice(APIView):
 #This class handles the request to buy a specific cryptocurrency
 #Uses a POST request to send the data to the server
 #The data is validated using the TradeRequestSerializer
-class BuyCrypto(APIView):
+class BuyCryptoView(APIView):
     def post(self, request):
         serializer = TradeRequestSerializer(data = request.data)
         if serializer.is_valid():
@@ -62,24 +71,29 @@ class BuyCrypto(APIView):
             if response.status_code != 200:
                 return Response({"error": "Failed to fetch price"}, status=400)
 
-            #Creates a trade object with data and added to similated database
-            trade = {
-                "trade_type": "BUY",
-                "cryptocurrency": coin,
-                "amount": amount,
-                "price_at_trade": float(response.json()["price"]),
-            }
+            price = float(response.json()["price"])
+            #Checks if the price is valid otherwise returns an error
+            
+            test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
 
-            trades.append(trade)
+            #Creates a trade object with data and added to similated database
+            trade = Trade.objects.create(
+                user=test_user,
+                currency=coin,
+                amount=amount,
+                price_at_trade=price,
+                trade_type="BUY"
+            )
+
             #Confirmation message
-            return Response({"message": "Buy order placed", "trade" : trade}, status=201)
+            return Response({"message": "Buy order placed", "trade" : serializer.data}, status=201)
         
         return Response(serializer.errors, status=400)
 
 #This class handles the request to sell a specific cryptocurrency
 #Uses a POST request to send the data to the server
 #The data is validated using the TradeRequestSerializer
-class SellCrypto(APIView):
+class SellCryptoView(APIView):
     def post(self, request):
         serializer = TradeRequestSerializer(data = request.data)
         if serializer.is_valid():
@@ -94,21 +108,32 @@ class SellCrypto(APIView):
             if response.status_code != 200:
                 return Response({"error": "Failed to fetch price"}, status=400)
 
-            #Creates a trade object with data and added to similated database
-            trade = {
-                "trade_type": "SELL",
-                "cryptocurrency": coin,
-                "amount": amount,
-                "price_at_trade": float(response.json()["price"]),
-            }
+            price = float(response.json()["price"])
+            #Checks if the price is valid otherwise returns an error
+            
+            test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
 
-            trades.append(trade)
+            #Creates a trade object with data and added to similated database
+            trade = Trade.objects.create(
+                user=test_user,
+                currency=coin,
+                amount=amount,
+                price_at_trade=price,
+                trade_type="SELL"
+            )
+
             #Confirmation message
             return Response({"message": "Sell order placed", "trade" : trade}, status=201)
         return Response(serializer.errors, status=400)
     
 #This class handles the request to get the trade history
 #Uses a GET request to send the data to the server
-class TradeHistory(APIView):
+class TradeHistoryView(APIView):
     def get(self, request):
-        return Response({"trade_history": trades})
+        test_user, _  = User.objects.get_or_create(username="testuser")
+        trades = Trade.objects.filter(user=test_user).order_by('-timestamp')
+
+        serializer = TradeSerializer(trades, many=True)
+        #Serializes the data using the TradeSerializer
+        
+        return Response({"trade_history": serializer.data})
