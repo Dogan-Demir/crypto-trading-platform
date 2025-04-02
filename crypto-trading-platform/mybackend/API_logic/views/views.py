@@ -14,16 +14,12 @@ from rest_framework import status
 #500 represents internal server error
 #201 represents created
 
-from ..serializers import TradeRequestSerializer
-#This is a serializer that will be used to validate the incoming data for the buy and sell requests
-#It will check if the data is in the correct format and return errors if not
+from ..serializers import TradeRequestSerializer, TradeSerializer, DepositSerializer, WithdrawalSerializer
+#Imports the serializers for the trade, deposit and withdrawal models
+#Serializers are used to convert complex data types, like querysets and model instances, into native Python datatypes that can then be easily rendered into JSON or XML.
 
-from ..serializers import TradeSerializer
-#Thi is a serializer that will be used to serialize the trade data for the response
-#It will convert the trade data into JSON format for the response
-
-from ..models import Trade
-#This is a model that will be used to store the trade data in the database
+from ..models import Trade, Deposit, Withdrawal
+#This is a models that will be used to store the trade (buy and sell), deposit and withdrawl data in the database
 
 from django.contrib.auth.models import User #TEST - imports the User model for testing purposes (will be removed later)
 
@@ -128,6 +124,46 @@ class SellCryptoView(APIView):
             return Response({"message": "Sell order placed", "trade" : trade_data}, status=201)
         return Response(serializer.errors, status=400)
     
+
+# this class handles the deposit requests
+class DepositView(APIView): 
+
+    # it uses a POST request to handle the deposit and validates it using the DepositSerializer
+    def post(self, request):
+        serializer = DepositSerializer(data=request.data) # creates serializer instance with the data from the request (whcih is amount and currency)
+
+        if serializer.is_valid(): 
+
+            test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
+
+            serializer.save(user=test_user, status="completed")  # if data is valid, it saves the deposit and changs status to completed
+            # it returns message to say successful and the deposit data
+            return Response({"message": "Deposit successful", "data": serializer.data}, status=status.HTTP_201_CREATED) # http status code 201 shows its successfully created
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) # but if data is invalid, it returns errors and a http 400
+    
+# This class handles withdrawal requests
+class WithdrawalView(APIView): 
+
+    # all very similar to the deposit view just now for withdrawals
+    def post(self, request):
+        serializer = WithdrawalSerializer(data=request.data)
+
+        test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
+        
+        if serializer.is_valid():
+            serializer.save(user=test_user, status="completed")  
+            return Response({"message": "Withdrawal successful", "data": serializer.data}, status=status.HTTP_201_CREATED) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class AllTransactionsView(APIView): #view returns all deposits and withdrawals in the db table
+    def get(self, request):
+        return Response({ 
+            "deposits": DepositSerializer(Deposit.objects.all(), many=True).data, # gets records of all deposits, serializes them and returns them in JSON format
+            "withdrawals": WithdrawalSerializer(Withdrawal.objects.all(), many=True).data #does the same for withdrawals
+        })
+
+
 #This class handles the request to get the trade history
 #Uses a GET request to send the data to the server
 class TradeHistoryView(APIView):
