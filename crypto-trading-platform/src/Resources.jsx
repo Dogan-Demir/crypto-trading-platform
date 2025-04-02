@@ -1,52 +1,99 @@
 import React from "react";
-import { useState } from "react";
 import NavBar2 from "./NavBar2";
 import bgImage from "./assets/Background-dark.png";
-import icon from './assets/FAQ-plus-symbol.png'
+import { Link } from "react-router-dom";
 
 export default function Resources() {
-    const [showResource, setShowResource] = useState({});
+    return (
+        <div className="flex min-h-screen bg-[#0F1429]">
+            <NavBar2 />
+            <main className="flex-1 ml-[398px]">
+                <div className="min-h-screen text-white bg-no-repeat bg-cover relative"
+                     style={{ 
+                         background: `url(${bgImage})`,
+                         backgroundPosition: 'center',
+                         backgroundSize: 'cover'
+                     }}>
+                    <div className="p-8">
+                        <h1 className="text-[40px] mb-6">Resources</h1>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {/* Cryptocurrency Basics */}
+                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg">
+                                <h2 className="text-xl font-bold mb-4">Cryptocurrency Basics</h2>
+                                <ul className="space-y-2">
+                                    <li>• What is cryptocurrency?</li>
+                                    <li>• How do cryptocurrencies work?</li>
+                                    <li>• Understanding blockchain technology</li>
+                                    <li>• Types of cryptocurrencies</li>
+                                </ul>
+                            </div>
 
-    const toggleResource = (index) => {
-        setShowResource((prevState)=>({
-            ...prevState,
-            [index]: !prevState[index]
-        }))
-    };
+                            {/* Trading Guide */}
+                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg">
+                                <h2 className="text-xl font-bold mb-4">Trading Guide</h2>
+                                <ul className="space-y-2">
+                                    <li>• Basic trading concepts</li>
+                                    <li>• Reading charts and analysis</li>
+                                    <li>• Trading strategies</li>
+                                    <li>• Risk management</li>
+                                </ul>
+                            </div>
 
-    return(
-        <div className="overflow-hidden h-screen flex">
-          <NavBar2/>
-          <div className="flex-1 overflow-y-scroll bg-no-repeat bg-cover ml-[398px] text-white" style={{ background: `url(${bgImage})` }}>
-            <h1 className="text-[40px] mt-[100px] ml-[53px]">Resources</h1>
-            {[...Array(5)].map((_, index) => (
-                <div key={index} className={`grid ${showResource[index] ? "h-[325px]":"h-[100px]"} w-[933px] grid-rows-[85px_auto] border rounded-3xl mt-[23px] ml-[53px]`}>
-                <div className="flex h-[px]">
-                    <p className="text-[30px] mt-[23px] ml-[23px]">Topic {index +1}</p>
-                    <button className="mt-[33px] mr-[23px] ml-auto text-[16px] text-blue-500 hover:underline" onClick={()=>toggleResource(index)} 
-                    style={{ backgroundImage: `url(${icon})`,backgroundSize: "contain",backgroundRepeat: "no-repeat",
-                    width: "30px", 
-                    height: "30px"}}></button>
-                </div>
-                <div className="">
-                    {showResource[index] && (
-                        <div>
-                            <hr className="border-t border-white-500" />
-                            <p className="text-[20px] ml-[23px] mt-[15px]">
-                              <a href="#">Resource 1 Link</a>
-                            </p>
-                            <p className="text-[20px] ml-[23px] mt-[15px]">
-                              <a href="#">Resource 2 Link</a>
-                            </p>
-                            <p className="text-[20px] ml-[23px] mt-[15px]">
-                              <a href="#">Resource 3 Link</a>
-                            </p>
+                            {/* Security */}
+                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg">
+                                <h2 className="text-xl font-bold mb-4">Security</h2>
+                                <ul className="space-y-2">
+                                    <li>• Wallet security best practices</li>
+                                    <li>• Safe trading tips</li>
+                                    <li>• Common scams to avoid</li>
+                                    <li>• Two-factor authentication</li>
+                                </ul>
+                            </div>
+
+                            {/* Market Analysis */}
+                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg">
+                                <h2 className="text-xl font-bold mb-4">Market Analysis</h2>
+                                <ul className="space-y-2">
+                                    <li>• Technical analysis basics</li>
+                                    <li>• Fundamental analysis</li>
+                                    <li>• Market indicators</li>
+                                    <li>• Trend analysis</li>
+                                </ul>
+                            </div>
+
+                            {/* News and Updates */}
+                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg">
+                                <h2 className="text-xl font-bold mb-4">News and Updates</h2>
+                                <ul className="space-y-2">
+                                    <li>• Latest cryptocurrency news</li>
+                                    <li>• Market updates</li>
+                                    <li>• Regulatory changes</li>
+                                    <li>• Industry developments</li>
+                                </ul>
+                            </div>
+
+                            {/* Community */}
+                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg">
+                                <h2 className="text-xl font-bold mb-4">Community</h2>
+                                <ul className="space-y-2">
+                                    <li>• Discussion forums</li>
+                                    <li>• Trading communities</li>
+                                    <li>• Expert insights</li>
+                                    <li>• Educational webinars</li>
+                                </ul>
+                            </div>
                         </div>
-                    )}
+
+                        {/* Additional Resources Button */}
+                        <div className="mt-8">
+                            <Link to="/Forum" 
+                                  className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+                                Visit Our Forum
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-                </div>  
-            ))}
-          </div>
+            </main>
         </div>
-    )
+    );
 }

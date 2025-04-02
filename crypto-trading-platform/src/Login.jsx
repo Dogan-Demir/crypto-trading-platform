@@ -1,54 +1,94 @@
 import bgImage from "./assets/Background-blur.png";
 import logo from "./assets/logoName.png";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import React, { useState } from "react";
+import { useAuth } from './AuthContext';
 
 export default function Login() {
+    const { login } = useAuth();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
     
-    const handleForm = (e) => {
+    const handleForm = async (e) => {
         e.preventDefault();
+        setError("");
 
         if (!username || !password) {
-            alert("Please fill in all fields.");
+            setError("Please fill in all fields.");
             return;
         }
-        console.log("Logging in...");
-    }
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username,
+                    password,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                login(data);
+                navigate('/Portfolio');
+            } else {
+                setError(data.detail || 'Login failed');
+            }
+        } catch (err) {
+            setError('Network error. Please try again.');
+        }
+    };
 
     return (
         <>
-        <div className="fixed top-5 left-5 right-5 z-10 px-4 py-2 text-amber-50">
-        <Link to='/'><img src={logo} alt="logo" className="h-8 mr-2" /></Link>
-        </div>
-        <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat" style={{ backgroundImage: `url(${bgImage})` }}>
-            <form onSubmit={handleForm} className="flex flex-col items-center justify-center w-[623px] h-[623px] border border-black rounded-lg bg-gradient-to-b from-[rgba(14,27,71,0.8)] to-[rgba(33,66,173,0.8)] backdrop-blur-sm opacity-90 p-6">
-                <p className="text-white text-[60px] font-medium mb-9 mt-14">Welcome back!</p>
-                <input 
-                    type="text" 
-                    placeholder="Enter username" 
-                    className="w-[409px] h-[48px] rounded-lg text-[25px] font-medium-small px-4 mb-9 bg-white border-2 border-gray-500" 
-                    onChange={(e) => setUsername(e.target.value.trim())} 
-                />
-                <input 
-                    type="password" 
-                    placeholder="Enter password" 
-                    className="w-[409px] h-[48px] rounded-lg text-[25px] font-medium-small px-4 mb-9 bg-white border-2 border-gray-500" 
-                    onChange={(e) => setPassword(e.target.value.trim())} 
-                />
-                <button 
-                    type="submit" 
-                    className="flex justify-center items-center w-[159px] h-[61px] rounded-full bg-gradient-to-r from-[#2011BA] to-[#57D2FF] text-white font-bold text-[25px] mb-12"
-                >SIGN IN</button>
-                <p className="text-white text-[20px] font-normal">
-                    <a href = "#" className="underline">Forgot Username or Password?</a>
-                </p>
-                <p className="text-white text-[20px] font-normal">
-                    Don't have an account? <Link to="/signup"><a href="#" className="underline">Sign up</a></Link>
-                </p>
-            </form>
-        </div>
+            <div className="fixed top-5 left-5 right-5 z-10 px-4 py-2 text-amber-50">
+                <Link to='/'><img src={logo} alt="logo" className="h-8 mr-2" /></Link>
+            </div>
+            <div className="min-h-screen flex items-center justify-center bg-cover bg-no-repeat" 
+                 style={{ backgroundImage: `url(${bgImage})` }}>
+                <div className="bg-black/50 backdrop-blur-lg p-8 rounded-lg w-96">
+                    <h2 className="text-2xl text-white mb-4">Login</h2>
+                    {error && <div className="text-red-500 mb-4">{error}</div>}
+                    <form onSubmit={handleForm}>
+                        <div className="mb-4">
+                            <input
+                                type="text"
+                                placeholder="Username"
+                                className="w-full p-2 rounded bg-gray-700 text-white"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                className="w-full p-2 rounded bg-gray-700 text-white"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+                        >
+                            Login
+                        </button>
+                    </form>
+                    <p className="text-white mt-4 text-center">
+                        Don't have an account?{' '}
+                        <Link to="/signup" className="text-blue-400 hover:underline">
+                            Sign up
+                        </Link>
+                    </p>
+                </div>
+            </div>
         </>
     );
 }
