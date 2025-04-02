@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_static',
     'django_otp.plugins.otp_totp',
     'two_factor',
+    'account',
 ]
 
 MIDDLEWARE = [
@@ -141,4 +142,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'two_factor:login'
-LOGIN_REDIRECT_URL = 'account:dashboard'
+LOGIN_REDIRECT_URL = 'account:two_factor_setup'
+TWO_FACTOR_LOGIN_VIEW = 'account:login'
+TWO_FACTOR_SETUP_VIEW = 'account:two_factor_setup'
+TWO_FACTOR_PROFILE_VIEW = 'account:dashboard'

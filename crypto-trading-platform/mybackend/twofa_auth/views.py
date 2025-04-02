@@ -9,3 +9,6 @@ def projects(request):
   
 def contact(request): 
     return render(request, "contact.html")
+
+def account(request): 
+    return render(request, "account.html")

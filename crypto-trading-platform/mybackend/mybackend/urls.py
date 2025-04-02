@@ -29,5 +29,6 @@ urlpatterns = [
     path('', index, name ='home'),
     path('signup/', SignUpView.as_view(), name ='signup'), 
     path('', include(tf_urls)),
+    path('account/', include('account.urls', namespace='account')),
 ]
     
