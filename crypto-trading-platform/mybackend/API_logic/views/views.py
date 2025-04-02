@@ -160,7 +160,8 @@ class AllTransactionsView(APIView): #view returns all deposits and withdrawals i
     def get(self, request):
         return Response({ 
             "deposits": DepositSerializer(Deposit.objects.all(), many=True).data, # gets records of all deposits, serializes them and returns them in JSON format
-            "withdrawals": WithdrawalSerializer(Withdrawal.objects.all(), many=True).data #does the same for withdrawals
+            "withdrawals": WithdrawalSerializer(Withdrawal.objects.all(), many=True).data, #does the same for withdrawals
+            "trades" : TradeSerializer(Trade.objects.all(), many=True).data #does the same for trades
         })
 
 
