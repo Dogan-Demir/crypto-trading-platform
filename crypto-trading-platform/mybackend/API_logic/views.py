@@ -1,3 +1,6 @@
+from django.conf import settings
+#Imports the settings from the Django project
+
 import requests
 #Python HTTP library for making requests to APIs
 
@@ -28,10 +31,38 @@ class getCoinPairsView(APIView):
     def get(self,request):
         try:
             url = "https://api.exchange.coinbase.com/products"
-            response = requests.get(url)
+            headers = {
+                'CB-ACCESS-KEY': settings.COINBASE_API_KEY_ID,
+                'Content-Type': 'application/json'
+            }
+            response = requests.get(url, headers=headers)
             response.raise_for_status()
-            #Makes a GET request and response is in JSON format
-            return Response(response.json())
+            products = response.json()
+            #Checks if the response is valid otherwise returns an error
+
+            usd_pairs = [item['id'] for item in products if item['quote_currency'] == 'USD']
+            result = []
+            #Iterates through the products and checks if the quote currency is USD
+
+            for pair in usd_pairs[:10]: #Limit to first 10 pairs for performance
+                price_url = f"https://api.exchange.coinbase.com/products/{pair}/ticker"
+                try:
+                    price_response = requests.get(price_url, headers=headers)
+                    price_response.raise_for_status()
+                    price = price_response.json().get("price", "N/A")
+                    #Checks if the response is valid otherwise returns an error
+                except:
+                    price = "Unavailable"
+                #If the price is not available it sets it to unavailable
+
+                result.append({
+                    "pair": pair,
+                    "price": price
+                })
+
+            return Response({"pairs": result})
+            #Returns the list of trading pairs and their prices in JSON format
+                                
         except requests.RequestException as e:
             #Accounts for any errors that may occur during the request
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -41,11 +72,23 @@ class getCoinPriceView(APIView):
     def get(self,request,coin,quote_currency):
         try:
             url = f"https://api.exchange.coinbase.com/products/{coin}-{quote_currency}/ticker"
-            response = requests.get(url)
+            headers = {
+                'CB-ACCESS-KEY': settings.COINBASE_API_KEY_ID,
+                'Content-Type': 'application/json'
+            }
+            response = requests.get(url, headers=headers)
             response.raise_for_status()
+            data = response.json()
             #Makes a GET request and response is in JSON format
             #Returns the price
-            return Response({"price": response.json()["price"]})
+            
+            return Response({
+                "coin": coin,
+                "quote_currency": quote_currency,
+                "price": data.get("price"),
+                "raw": data
+            })
+            
         except requests.RequestException as e:
             #Accounts for any errors that may occur during the request
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
