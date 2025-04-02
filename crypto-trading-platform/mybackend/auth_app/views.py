@@ -6,7 +6,9 @@ from decimal import Decimal
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-# views function takes a request and returns a response / requesst handler / action
+
+from rest_framework import generics
+from .serializers import SignupSerializer
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -48,6 +50,7 @@ class CryptocurrencyListView(generics.ListAPIView):
 from django.http import HttpResponse
 
 def index(request):
+
     return HttpResponse("Welcome to the crypto trading platform!")
 
 class LoginView(generics.GenericAPIView):
@@ -117,3 +120,4 @@ def get_balance(request):
 def logout_view(request):
     request.user.auth_token.delete()
     return Response({'detail': 'Successfully logged out.'}, status=status.HTTP_200_OK)
+

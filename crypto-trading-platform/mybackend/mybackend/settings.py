@@ -42,7 +42,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'auth_app',
     'corsheaders',
+
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
+    'account',
     'rest_framework.authtoken',
+
 ]
 
 MIDDLEWARE = [
@@ -54,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django_otp.middleware.OTPMiddleware'
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'mybackend.urls'
@@ -61,7 +69,7 @@ ROOT_URLCONF = 'mybackend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,10 +137,19 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_URL = 'two_factor:login'
+LOGIN_REDIRECT_URL = 'account:two_factor_setup'
+TWO_FACTOR_LOGIN_VIEW = 'account:login'
+TWO_FACTOR_SETUP_VIEW = 'account:two_factor_setup'
+TWO_FACTOR_PROFILE_VIEW = 'account:dashboard'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -140,3 +157,4 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
+
