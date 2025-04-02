@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.views import (getCoinPairsView, 
+from .views import (getCoinPairsView, 
                           getCoinPriceView, 
                           BuyCryptoView, 
                           SellCryptoView, 

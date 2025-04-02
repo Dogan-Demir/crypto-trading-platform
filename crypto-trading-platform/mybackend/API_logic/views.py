@@ -14,11 +14,11 @@ from rest_framework import status
 #500 represents internal server error
 #201 represents created
 
-from ..serializers import TradeRequestSerializer, TradeSerializer, DepositSerializer, WithdrawalSerializer
+from .serializers import TradeRequestSerializer, TradeSerializer, DepositSerializer, WithdrawalSerializer
 #Imports the serializers for the trade, deposit and withdrawal models
 #Serializers are used to convert complex data types, like querysets and model instances, into native Python datatypes that can then be easily rendered into JSON or XML.
 
-from ..models import Trade, Deposit, Withdrawal
+from .models import Trade, Deposit, Withdrawal
 #This is a models that will be used to store the trade (buy and sell), deposit and withdrawl data in the database
 
 from django.contrib.auth.models import User #TEST - imports the User model for testing purposes (will be removed later)
