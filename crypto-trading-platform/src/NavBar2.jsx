@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from './assets/logoName.png';
 import bgImage from './assets/Background-blur-quarter.png';
 import account from './assets/Account-icon.png';
@@ -12,6 +12,42 @@ import priceAlerts from './assets/PriceAlert-icon.png';
 import settings from './assets/Settings-icon.png';
 
 export default function Navbar() {
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        console.log('Logout initiated');
+        try {
+            // Call Django logout endpoint
+            const response = await fetch('http://127.0.0.1:8000/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            console.log('Logout response:', response);
+
+            if (response.ok) {
+                console.log('Logout successful');
+                // Clear the authentication token
+                localStorage.removeItem('token');
+                // Force a page reload to clear any cached state
+                window.location.href = '/';
+            } else {
+                console.error('Logout failed:', await response.text());
+                // Fallback: clear token and redirect anyway
+                localStorage.removeItem('token');
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Fallback: clear token and redirect anyway
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
+    };
+
     return (
         <div className="fixed z-10 px-4 py-2 text-amber-50 h-[1024px] w-[398px] bg-no-repeat" style={{ background: `url(${bgImage})` }}>
             <nav className="grid justify-between items-center">
@@ -67,6 +103,14 @@ export default function Navbar() {
                                 <img src={settings} alt='settings' className='ml-5.5 mr-5'/>
                                 Settings
                             </Link>
+                        </li>
+                        <li>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center justify-center space-x-4 p-2 bg-red-600 hover:bg-red-700 rounded text-white mt-[32px]"
+                            >
+                                <span className="text-lg">Logout</span>
+                            </button>
                         </li>
                     </ul>
                 </div>

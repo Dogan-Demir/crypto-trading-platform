@@ -13,25 +13,32 @@ import FAQs2 from "./FAQsNonMember";
 import Forum from "./Forum";
 import ResourcesNonMember from "./ResourcesNonMember";
 import PriceHistory from "./PriceHistory";
+import Deposit from "./Deposit";
+import Trading from "./Trading";
+import { AuthProvider } from './AuthContext';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/Account" element={<Account />} />
-      <Route path="/Portfolio" element={<Portfolio />} />
-      <Route path="/Transaction" element={<Transaction />} />
-      <Route path="/Resources" element={<Resources />} />
-      <Route path="/FAQs" element={<FAQs />} />
-      <Route path="/Orders" element={<Orders />} />
-      <Route path="/Settings" element={<Settings />} />
-      <Route path='/FAQsNonMember' element={<FAQs2 />} />
-      <Route path='/Forum' element={<Forum />} />
-      <Route path='/ResourcesNonMember' element={<ResourcesNonMember />} />
-      <Route path='/PriceHistory' element={<PriceHistory />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/Account" element={<Account />} />
+        <Route path="/Portfolio" element={<Portfolio />} />
+        <Route path="/Transaction" element={<Transaction />} />
+        <Route path="/Resources" element={<Resources />} />
+        <Route path="/FAQs" element={<FAQs />} />
+        <Route path="/Orders" element={<Orders />} />
+        <Route path="/Settings" element={<Settings />} />
+        <Route path='/FAQsNonMember' element={<FAQs2 />} />
+        <Route path='/Forum' element={<Forum />} />
+        <Route path='/ResourcesNonMember' element={<ResourcesNonMember />} />
+        <Route path='/PriceHistory' element={<PriceHistory />} />
+        <Route path="/deposit" element={<Deposit />} />
+        <Route path="/trading" element={<Trading />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 

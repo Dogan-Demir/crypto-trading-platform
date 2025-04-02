@@ -1,8 +1,11 @@
 import {Link} from "react-router-dom";
 import bgImage from "./assets/Background-blur.png";
 import Navbar from "./Navbar";
+import { useAuth } from './AuthContext';
 
 function LandingPage() {
+    const { isAuthenticated } = useAuth();
+
     return (
         <div className="min-h-screen flex items-center justify-start bg-cover bg-no-repeat border border-black bg-gradient-to-t from-black/26 to-black/26" style={{ backgroundImage: `url(${bgImage})` }}>
             <Navbar />
@@ -21,9 +24,26 @@ function LandingPage() {
 
                 {/* Buttons */}
                 <div className="flex space-x-4 mt-8">
-                <Link to="/login"><button className="px-6 py-3 text-white border border-white rounded-full bg-[#091267] hover:bg-[#0a1b4c] transition duration-300">Login</button></Link>
-                <Link to="/signup"><button className="px-6 py-3 text-white rounded-full bg-gradient-to-r from-[#2011BA] to-[#57D2FF] hover:from-[#3b2ee0] hover:to-[#3fd2f1] transition duration-300">Sign up</button></Link>
-
+                    {!isAuthenticated ? (
+                        <>
+                            <Link to="/login">
+                                <button className="px-6 py-3 text-white border border-white rounded-full bg-[#091267] hover:bg-[#0a1b4c] transition duration-300">
+                                    Login
+                                </button>
+                            </Link>
+                            <Link to="/signup">
+                                <button className="px-6 py-3 text-white rounded-full bg-gradient-to-r from-[#2011BA] to-[#57D2FF] hover:from-[#3b2ee0] hover:to-[#3fd2f1] transition duration-300">
+                                    Sign up
+                                </button>
+                            </Link>
+                        </>
+                    ) : (
+                        <Link to="/Portfolio">
+                            <button className="px-6 py-3 text-white rounded-full bg-gradient-to-r from-[#2011BA] to-[#57D2FF] hover:from-[#3b2ee0] hover:to-[#3fd2f1] transition duration-300">
+                                Go to Portfolio
+                            </button>
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>
