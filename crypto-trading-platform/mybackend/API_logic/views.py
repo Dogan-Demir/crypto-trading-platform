@@ -1,3 +1,9 @@
+from .utils import get_balance, update_balance, has_sufficient_balance
+#This file contains the views for the API endpoints of the crypto trading platform.
+
+from decimal import Decimal
+#Imports the Decimal class from the decimal module for precise decimal arithmetic
+
 from django.conf import settings
 #Imports the settings from the Django project
 
@@ -110,10 +116,17 @@ class BuyCryptoView(APIView):
             if response.status_code != 200:
                 return Response({"error": "Failed to fetch price"}, status=400)
 
-            price = float(response.json()["price"])
+            price = Decimal(response.json()["price"])
             #Checks if the price is valid otherwise returns an error
             
+            cost = price * amount # calculates the cost of the trade
+
             test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
+            if not has_sufficient_balance(test_user, "USD", cost):
+                return Response({"error": "Insufficient balance"}, status=400)
+
+            update_balance(test_user, "USD", -cost) # updates the balance of the user by subtracting the cost of the trade
+            update_balance(test_user, coin, amount) # updates the balance of the user by adding the amount of the trade
 
             #Creates a trade object with data and added to similated database
             trade = Trade.objects.create(
@@ -148,10 +161,17 @@ class SellCryptoView(APIView):
             if response.status_code != 200:
                 return Response({"error": "Failed to fetch price"}, status=400)
 
-            price = float(response.json()["price"])
+            price = Decimal(response.json()["price"])
             #Checks if the price is valid otherwise returns an error
+
+            revenue = price * amount # calculates the revenue of the trade
             
             test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
+            if not has_sufficient_balance(test_user, coin, amount):
+                return Response({"error": "Insufficient balance"}, status=400)
+
+            update_balance(test_user, coin, -amount) # updates the balance of the user by subtracting the amount of the trade
+            update_balance(test_user, "USD", revenue) # updates the balance of the user by adding the revenue of the trade
 
             #Creates a trade object with data and added to similated database
             trade = Trade.objects.create(
@@ -170,7 +190,6 @@ class SellCryptoView(APIView):
 
 # this class handles the deposit requests
 class DepositView(APIView): 
-
     # it uses a POST request to handle the deposit and validates it using the DepositSerializer
     def post(self, request):
         serializer = DepositSerializer(data=request.data) # creates serializer instance with the data from the request (whcih is amount and currency)
@@ -180,6 +199,12 @@ class DepositView(APIView):
             test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
 
             serializer.save(user=test_user, status="completed")  # if data is valid, it saves the deposit and changs status to completed
+            
+            #Update balance
+            currency = serializer.validated_data['currency'] # gets the currency from the validated data
+            amount = serializer.validated_data['amount'] # gets the amount from the validated data
+            update_balance(test_user, currency, amount) # updates the balance of the user by adding the amount of the deposit
+
             # it returns message to say successful and the deposit data
             return Response({"message": "Deposit successful", "data": serializer.data}, status=status.HTTP_201_CREATED) # http status code 201 shows its successfully created
         
@@ -187,18 +212,28 @@ class DepositView(APIView):
     
 # This class handles withdrawal requests
 class WithdrawalView(APIView): 
-
     # all very similar to the deposit view just now for withdrawals
     def post(self, request):
         serializer = WithdrawalSerializer(data=request.data)
 
-        test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
-        
         if serializer.is_valid():
-            serializer.save(user=test_user, status="completed")  
+            
+            test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the withdrawl
+
+            #Update balance
+            currency = serializer.validated_data['currency'] # gets the currency from the validated data
+            amount = serializer.validated_data['amount'] # gets the amount from the validated data
+            
+            if not has_sufficient_balance(test_user, currency, amount):
+                return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.save(user=test_user, status="completed")
+            update_balance(test_user, currency, -amount) # updates the balance of the user by adding the amount of the withdrawl  
+            
             return Response({"message": "Withdrawal successful", "data": serializer.data}, status=status.HTTP_201_CREATED) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+ 
 class AllTransactionsView(APIView): #view returns all deposits and withdrawals in the db table
     def get(self, request):
         return Response({ 
@@ -225,8 +260,29 @@ class TradeHistoryView(APIView):
 class GetBalanceView(APIView):
     def get(self, request):
         test_user, _  = User.objects.get_or_create(username="testuser")
-        balance = MockBalance.objects.filter(user=test_user)
+        balances = MockBalance.objects.filter(user=test_user)
         #Gets the balance of the test user from the database
-        serializer = MockBalanceSerializer(balance, many=True)
+        serializer = MockBalanceSerializer(balances, many=True)
         #Serializes the data using the MockBalanceSerializer
-        return Response({"balance": serializer.data})
+        return Response({"balances": serializer.data})
+
+#This class handles the request to set the starting balance for a specific cryptocurrency   
+class StartBalanceView(APIView):
+    def post(self, request):
+        test_user, _  = User.objects.get_or_create(username="testuser")
+        currency = request.data.get("currency")
+        amount = request.data.get("amount")
+
+        #Checks if the currency and amount are provided in the request data
+        if not currency or not amount:
+            return Response({"error": "Currency and amount are required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        #Checks if the currency is valid (only USD, BTC, ETH, LTC are allowed)
+        #If it doesn't exist it creates a new one
+        balance_obj, created = MockBalance.objects.get_or_create(user=test_user, currency=currency.upper())
+        balance_obj.balance = Decimal(amount)
+        balance_obj.save()
+
+        return Response({"message": f"{currency} balance set to {amount}."})
+    
+

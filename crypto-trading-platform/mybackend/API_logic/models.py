@@ -39,3 +39,10 @@ class Trade(models.Model):
         return f"{self.user.username} {self.trade_type} {self.amount} {self.currency} at {self.price_at_trade}"
     
 
+class MockBalance(models.Model): # this is a mock balance model for testing purposes
+    user = models.ForeignKey(User, on_delete=models.CASCADE) # foreign key to user model
+    currency = models.CharField(max_length=10) # currency type
+    balance = models.DecimalField(max_digits=20, decimal_places=2) # the amount of money in the account
+
+    def __str__(self):
+        return f"{self.user.username} - {self.currency}: {self.balance}" # returns string of user and how much they have in their account
