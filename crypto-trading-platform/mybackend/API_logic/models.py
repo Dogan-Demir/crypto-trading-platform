@@ -37,3 +37,5 @@ class Trade(models.Model):
 
     def __str__(self):
         return f"{self.user.username} {self.trade_type} {self.amount} {self.currency} at {self.price_at_trade}"
+    
+

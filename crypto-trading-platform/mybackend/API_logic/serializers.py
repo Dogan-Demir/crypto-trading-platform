@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from .models import Deposit, Withdrawal, Trade # it imports the models
+from .models import Deposit, Withdrawal, Trade, MockBalance # it imports the models
 
 
 class TradeRequestSerializer(serializers.Serializer):
@@ -22,3 +22,9 @@ class TradeSerializer(serializers.ModelSerializer): # serializer for the trade m
     class Meta:
         model = Trade
         fields = '__all__'
+
+
+class MockBalanceSerializer(serializers.ModelSerializer): # serializer for the mock balance model
+    class Meta:
+        model = MockBalance # based on mock balance model
+        fields = '__all__' # only these fields will be serialized

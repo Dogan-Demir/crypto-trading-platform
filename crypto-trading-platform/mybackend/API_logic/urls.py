@@ -7,6 +7,7 @@ from .views import (getCoinPairsView,
                           DepositView, 
                           WithdrawalView, 
                           AllTransactionsView,
+                          GetBalanceView,
                           )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path('deposit/', DepositView.as_view(), name='deposit'),
     path('withdraw/', WithdrawalView.as_view(), name='withdraw'),
     path('transactions/', AllTransactionsView.as_view(), name='all-transactions'),
+    path('balance/', GetBalanceView.as_view(), name='get-balance'), # Added this line to include the new endpoint
 ]
