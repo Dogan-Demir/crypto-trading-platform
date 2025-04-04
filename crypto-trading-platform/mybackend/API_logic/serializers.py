@@ -1,13 +1,14 @@
 from rest_framework import serializers 
 from .models import Deposit, Withdrawal, Trade, MockBalance # it imports the models
-
+from decimal import Decimal, getcontext
+getcontext().prec = 18 # set the precision for decimal operations to 18
 
 class TradeRequestSerializer(serializers.Serializer):
     currency = serializers.CharField()
-    amount = serializers.FloatField()
+    amount = serializers.DecimalField(max_digits=20, decimal_places=8)
 
 class DepositSerializer(serializers.ModelSerializer): # the serializer for the deposit model
-    amount = serializers.FloatField() # amount gets treated as a float
+    amount = serializers.DecimalField(max_digits=20, decimal_places=8) 
 
     class Meta: # inner class to give metadata about the serializer
         model = Deposit # based on deposit model

@@ -1,8 +1,10 @@
 from .utils import get_balance, update_balance, has_sufficient_balance
 #This file contains the views for the API endpoints of the crypto trading platform.
 
-from decimal import Decimal
+from decimal import Decimal, getcontext
 #Imports the Decimal class from the decimal module for precise decimal arithmetic
+getcontext().prec = 18
+#Sets the precision for decimal operations to 18 decimal places
 
 from django.conf import settings
 #Imports the settings from the Django project
@@ -125,9 +127,13 @@ class BuyCryptoView(APIView):
             if not has_sufficient_balance(test_user, "USD", cost):
                 return Response({"error": "Insufficient balance"}, status=400)
 
-            update_balance(test_user, "USD", -cost) # updates the balance of the user by subtracting the cost of the trade
+            try:
+                update_balance(test_user, "USD", -cost) # updates the balance of the user by subtracting the cost of the trade
+            except ValueError as e:
+                return Response({"error": str(e)}, status=400)
+            
             update_balance(test_user, coin, amount) # updates the balance of the user by adding the amount of the trade
-
+            
             #Creates a trade object with data and added to similated database
             trade = Trade.objects.create(
                 user=test_user,
@@ -170,8 +176,11 @@ class SellCryptoView(APIView):
             if not has_sufficient_balance(test_user, coin, amount):
                 return Response({"error": "Insufficient balance"}, status=400)
 
-            update_balance(test_user, coin, -amount) # updates the balance of the user by subtracting the amount of the trade
-            update_balance(test_user, "USD", revenue) # updates the balance of the user by adding the revenue of the trade
+            try:
+                update_balance(test_user, coin, -amount) # updates the balance of the user by subtracting the amount of the trade
+                update_balance(test_user, "USD", revenue) # updates the balance of the user by adding the revenue of the trade
+            except ValueError as e:
+                return Response({"error": str(e)}, status=400)
 
             #Creates a trade object with data and added to similated database
             trade = Trade.objects.create(
@@ -203,8 +212,12 @@ class DepositView(APIView):
             #Update balance
             currency = serializer.validated_data['currency'] # gets the currency from the validated data
             amount = serializer.validated_data['amount'] # gets the amount from the validated data
-            update_balance(test_user, currency, amount) # updates the balance of the user by adding the amount of the deposit
-
+            
+            try:
+                update_balance(test_user, currency, amount) # updates the balance of the user by adding the amount of the deposit
+            except ValueError as e:
+                return Response({"error": str(e)}, status=400)
+            
             # it returns message to say successful and the deposit data
             return Response({"message": "Deposit successful", "data": serializer.data}, status=status.HTTP_201_CREATED) # http status code 201 shows its successfully created
         
@@ -228,8 +241,12 @@ class WithdrawalView(APIView):
                 return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
 
             serializer.save(user=test_user, status="completed")
-            update_balance(test_user, currency, -amount) # updates the balance of the user by adding the amount of the withdrawl  
             
+            try:
+                update_balance(test_user, currency, -amount) # updates the balance of the user by adding the amount of the withdrawl  
+            except ValueError as e:
+                return Response({"error": str(e)}, status=400)
+
             return Response({"message": "Withdrawal successful", "data": serializer.data}, status=status.HTTP_201_CREATED) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -279,9 +296,11 @@ class StartBalanceView(APIView):
         
         #Checks if the currency is valid (only USD, BTC, ETH, LTC are allowed)
         #If it doesn't exist it creates a new one
-        balance_obj, created = MockBalance.objects.get_or_create(user=test_user, currency=currency.upper())
-        balance_obj.balance = Decimal(amount)
-        balance_obj.save()
+        balance_obj, created = MockBalance.objects.get_or_create(user=test_user, currency=currency.upper(), defaults={"balance":Decimal(amount)})
+        
+        if not created:
+            balance_obj.balance = Decimal(amount)
+            balance_obj.save()
 
         return Response({"message": f"{currency} balance set to {amount}."})
     
