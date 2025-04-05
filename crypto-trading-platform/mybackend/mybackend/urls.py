@@ -17,9 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import path, include
+from auth_app import views
+from auth_app.views import SignUpView  
+from auth_app.views import index  
+from two_factor.urls import urlpatterns as tf_urls
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('auth_app.urls')),
+    path('', index, name ='home'),
+    path('signup/', SignUpView.as_view(), name ='signup'), 
+    path('', include(tf_urls)),
+    path('account/', include('account.urls', namespace='account')),
     path('api/', include('API_logic.urls')),
 ]
+    
