@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'two_factor',
     'account',
     'rest_framework.authtoken',
+    'support',
 
 ]
 
