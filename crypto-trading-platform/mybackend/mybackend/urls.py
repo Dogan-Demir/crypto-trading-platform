@@ -31,5 +31,6 @@ urlpatterns = [
     path('', include(tf_urls)),
     path('account/', include('account.urls', namespace='account')),
     path('api/', include('API_logic.urls')),
+    path('support/', include('support.urls')),
 ]
     
