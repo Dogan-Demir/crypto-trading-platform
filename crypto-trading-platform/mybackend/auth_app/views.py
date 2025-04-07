@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
-from .serializers import SignupSerializer, TransactionSerializer, PortfolioSerializer, CryptocurrencySerializer, LoginSerializer, DepositSerializer
-from .models import Transaction, Portfolio, Cryptocurrency, Deposit
+from .serializers import SignupSerializer, TransactionSerializer, PortfolioSerializer, CryptocurrencySerializer, LoginSerializer
+from .models import Transaction, Portfolio, Cryptocurrency
 import uuid
 from decimal import Decimal
 from rest_framework.decorators import api_view, permission_classes
@@ -111,6 +111,7 @@ class LoginView(generics.GenericAPIView):
             'email': user.email
         })
 
+"""
 class DepositView(generics.CreateAPIView):
     serializer_class = DepositSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -250,4 +251,4 @@ def verify_2fa_token(request):
             return Response({'detail': 'Invalid token'}, status=400)
     
     return Response({'detail': 'Invalid 2FA method'}, status=400)
-
+"""
