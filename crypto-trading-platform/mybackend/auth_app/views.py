@@ -111,40 +111,6 @@ class LoginView(generics.GenericAPIView):
             'email': user.email
         })
 
-"""
-class DepositView(generics.CreateAPIView):
-    serializer_class = DepositSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        # Generate a unique reference for the deposit
-        reference = str(uuid.uuid4())
-        
-        # Create the deposit record
-        deposit = Deposit.objects.create(
-            user=self.request.user,
-            amount=serializer.validated_data['amount'],
-            reference=reference,
-            status='COMPLETED'  # In a real app, this would be 'PENDING' until payment confirmation
-        )
-
-        # Update user's balance
-        profile = self.request.user.userprofile
-        profile.balance += deposit.amount
-        profile.save()
-
-        return deposit
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        deposit = self.perform_create(serializer)
-        
-        return Response({
-            'message': 'Deposit successful',
-            'amount': deposit.amount,
-            'new_balance': self.request.user.userprofile.balance
-        }, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -152,6 +118,7 @@ def get_balance(request):
     return Response({
         'balance': request.user.userprofile.balance
     })
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -251,4 +218,4 @@ def verify_2fa_token(request):
             return Response({'detail': 'Invalid token'}, status=400)
     
     return Response({'detail': 'Invalid 2FA method'}, status=400)
-"""
+
