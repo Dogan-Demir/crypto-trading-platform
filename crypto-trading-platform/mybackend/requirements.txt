@@ -1,0 +1,17 @@
+asgiref==3.8.1
+cffi==1.17.1
+cryptography==44.0.2
+Django==5.1.7
+django-cors-headers==4.7.0
+django-otp==1.3.0
+django-two-factor-auth==1.17.0
+djangorestframework==3.15.2
+djangorestframework_simplejwt==5.5.0
+mysqlclient==2.2.7
+phonenumbers==8.13.33
+pycparser==2.22
+PyJWT==2.9.0
+PyMySQL==1.1.1
+python-dotenv==1.1.0
+requests==2.31.0
+sqlparse==0.5.3 

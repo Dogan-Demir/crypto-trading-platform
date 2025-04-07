@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Two-Factor Authentication Setup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .qr-code {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .qr-code img {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        .instructions {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .verification-form {
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #166fe5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Two-Factor Authentication Setup</h1>
+        
+        {% if method == 'TOTP' %}
+            <div class="qr-code">
+                <img src="{{ qr_code }}" alt="QR Code">
+            </div>
+            <div class="instructions">
+                <p>1. Install an authenticator app (like Google Authenticator or Authy) on your phone</p>
+                <p>2. Scan the QR code above with the app</p>
+                <p>3. Enter the 6-digit code from the app below</p>
+            </div>
+            <form method="post" class="verification-form">
+                {% csrf_token %}
+                <input type="text" name="token" placeholder="Enter 6-digit code" required>
+                <button type="submit">Verify</button>
+            </form>
+        {% elif method == 'EMAIL' %}
+            <div class="instructions">
+                <p>We've sent a verification code to your email address.</p>
+                <p>Please enter the code below to complete the setup.</p>
+            </div>
+            <form method="post" class="verification-form">
+                {% csrf_token %}
+                <input type="text" name="token" placeholder="Enter verification code" required>
+                <button type="submit">Verify</button>
+            </form>
+        {% elif method == 'SMS' %}
+            <div class="instructions">
+                <p>We've sent a verification code to your phone number.</p>
+                <p>Please enter the code below to complete the setup.</p>
+            </div>
+            <form method="post" class="verification-form">
+                {% csrf_token %}
+                <input type="text" name="token" placeholder="Enter verification code" required>
+                <button type="submit">Verify</button>
+            </form>
+        {% else %}
+            <div class="instructions">
+                <p>Please select your preferred two-factor authentication method:</p>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" name="method" value="TOTP">Use Authenticator App</button>
+                <button type="submit" name="method" value="EMAIL">Use Email</button>
+                <button type="submit" name="method" value="SMS">Use SMS</button>
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html> 

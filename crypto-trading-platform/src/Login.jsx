@@ -20,6 +20,9 @@ export default function Login() {
             return;
         }
 
+        // Check if the input is an email
+        const isEmail = username.includes('@');
+
         try {
             const response = await fetch('http://127.0.0.1:8000/api/login/', {
                 method: 'POST',
@@ -27,7 +30,7 @@ export default function Login() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username,
+                    [isEmail ? 'email' : 'username']: username,
                     password,
                 }),
             });

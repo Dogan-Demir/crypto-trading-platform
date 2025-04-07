@@ -3,7 +3,7 @@ from django.contrib.auth.models import User # imports the User model from Django
 
 class Deposit(models.Model): # this is the database model for storing info on deposits
 # columns in the db table
-    user = models.ForeignKey(User, on_delete=models.CASCADE) # foriegn key to user model
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='api_deposits') # foriegn key to user model
     amount = models.DecimalField(max_digits=20, decimal_places=8) # the amount whichll get deposited
     currency = models.CharField(max_length=10) #currency 
     timestamp = models.DateTimeField(auto_now_add=True) # it exact timestamp when it happens gets automatically added

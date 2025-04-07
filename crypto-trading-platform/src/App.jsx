@@ -15,6 +15,7 @@ import ResourcesNonMember from "./ResourcesNonMember";
 import PriceHistory from "./PriceHistory";
 import Deposit from "./Deposit";
 import Trading from "./Trading";
+import TwoFactorSetup from "./TwoFactorSetup";
 import { AuthProvider } from './AuthContext';
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
         <Route path='/PriceHistory' element={<PriceHistory />} />
         <Route path="/deposit" element={<Deposit />} />
         <Route path="/trading" element={<Trading />} />
+        <Route path="/two-factor-setup" element={<TwoFactorSetup />} />
       </Routes>
     </AuthProvider>
   );

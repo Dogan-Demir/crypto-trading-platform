@@ -10,6 +10,24 @@ class UserProfile(models.Model):
     balance = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
     # Automatically sets when profile is created
     created_at = models.DateTimeField(auto_now_add=True)
+    # 2FA settings
+    two_factor_enabled = models.BooleanField(default=False)
+    two_factor_method = models.CharField(
+        max_length=10,
+        choices=[
+            ('EMAIL', 'Email'),
+            ('SMS', 'SMS'),
+            ('TOTP', 'Authenticator App')
+        ],
+        null=True,
+        blank=True
+    )
+    # Phone number for SMS verification
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    # Email verification code
+    email_verification_code = models.CharField(max_length=6, null=True, blank=True)
+    # SMS verification code
+    sms_verification_code = models.CharField(max_length=6, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s profile"
@@ -80,7 +98,7 @@ class Deposit(models.Model):
         ('FAILED', 'Failed'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='auth_deposits')
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     status = models.CharField(max_length=10, choices=DEPOSIT_STATUS, default='PENDING')
     timestamp = models.DateTimeField(auto_now_add=True)
