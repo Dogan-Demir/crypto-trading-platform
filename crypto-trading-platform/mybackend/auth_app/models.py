@@ -91,18 +91,3 @@ class Portfolio(models.Model):
     def __str__(self):
         return f"{self.user.username}'s {self.cryptocurrency.symbol} holdings"
 
-class Deposit(models.Model):
-    DEPOSIT_STATUS = [
-        ('PENDING', 'Pending'),
-        ('COMPLETED', 'Completed'),
-        ('FAILED', 'Failed'),
-    ]
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='auth_deposits')
-    amount = models.DecimalField(max_digits=15, decimal_places=2)
-    status = models.CharField(max_length=10, choices=DEPOSIT_STATUS, default='PENDING')
-    timestamp = models.DateTimeField(auto_now_add=True)
-    reference = models.CharField(max_length=50, unique=True)
-
-    def __str__(self):
-        return f"{self.user.username} - £{self.amount} - {self.status}"

@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
-from .models import UserProfile, Transaction, Portfolio, Cryptocurrency, Deposit
+from .models import UserProfile, Transaction, Portfolio, Cryptocurrency
 from django.contrib.auth import authenticate
 
 # Custom password validation
@@ -143,11 +143,6 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Invalid credentials.')
         
         return data
-
-class DepositSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Deposit
-        fields = ['amount']
 
 class UserBalanceSerializer(serializers.ModelSerializer):
     balance = serializers.DecimalField(max_digits=15, decimal_places=2, source='userprofile.balance')
