@@ -9,6 +9,16 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(dotenv_path=BASE_DIR / '.env')
+
+COINBASE_API_KEY_ID = os.getenv('COINBASE_API_KEY_ID')
+COINBASE_API_SECRET = os.getenv('COINBASE_API_SECRET')
 
 import pymysql
 pymysql.install_as_MySQLdb()
@@ -41,8 +51,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'auth_app',
+    'API_logic',
     'corsheaders',
+
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
+    'account',
     'rest_framework.authtoken',
+    'support',
+
 ]
 
 MIDDLEWARE = [
@@ -54,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django_otp.middleware.OTPMiddleware'
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 ROOT_URLCONF = 'mybackend.urls'
@@ -61,7 +81,7 @@ ROOT_URLCONF = 'mybackend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,10 +149,19 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_URL = 'two_factor:login'
+LOGIN_REDIRECT_URL = 'account:two_factor_setup'
+TWO_FACTOR_LOGIN_VIEW = 'account:login'
+TWO_FACTOR_SETUP_VIEW = 'account:two_factor_setup'
+TWO_FACTOR_PROFILE_VIEW = 'account:dashboard'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -140,3 +169,4 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
 }
+

@@ -1,0 +1,15 @@
+import time
+import pyotp
+import qrcode
+
+key = "KEYTEST"
+
+
+uri = pyotp.TOTP(key).provisioning_uri(name = "Sean",
+                                            issuer_name ="Cryptx")
+
+print(uri)
+
+qrcode.make(uri).save("topt.png")
+
+
