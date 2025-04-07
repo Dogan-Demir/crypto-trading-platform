@@ -34,8 +34,12 @@ from .models import Trade, Deposit, Withdrawal, MockBalance
 
 from django.contrib.auth.models import User #TEST - imports the User model for testing purposes (will be removed later)
 
+from rest_framework.permissions import IsAuthenticated
+#Imports the IsAuthenticated permission class to restrict access to authenticated users
+
 #This class handles the request to get all available trading pairs from the Coinbase API
 class getCoinPairsView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         try:
             url = "https://api.exchange.coinbase.com/products"
@@ -77,6 +81,7 @@ class getCoinPairsView(APIView):
 
 #This class handles the request to get the price of a specific trading pair from the Coinbase API
 class getCoinPriceView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self,request,coin,quote_currency):
         try:
             url = f"https://api.exchange.coinbase.com/products/{coin}-{quote_currency}/ticker"
@@ -105,6 +110,7 @@ class getCoinPriceView(APIView):
 #Uses a POST request to send the data to the server
 #The data is validated using the TradeRequestSerializer
 class BuyCryptoView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = TradeRequestSerializer(data = request.data)
         if serializer.is_valid():
@@ -123,20 +129,21 @@ class BuyCryptoView(APIView):
             
             cost = price * amount # calculates the cost of the trade
 
-            test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
-            if not has_sufficient_balance(test_user, "USD", cost):
+            user = request.user
+
+            if not has_sufficient_balance(user, "USD", cost):
                 return Response({"error": "Insufficient balance"}, status=400)
 
             try:
-                update_balance(test_user, "USD", -cost) # updates the balance of the user by subtracting the cost of the trade
+                update_balance(user, "USD", -cost) # updates the balance of the user by subtracting the cost of the trade
             except ValueError as e:
                 return Response({"error": str(e)}, status=400)
             
-            update_balance(test_user, coin, amount) # updates the balance of the user by adding the amount of the trade
+            update_balance(user, coin, amount) # updates the balance of the user by adding the amount of the trade
             
             #Creates a trade object with data and added to similated database
             trade = Trade.objects.create(
-                user=test_user,
+                user=user,
                 currency=coin,
                 amount=amount,
                 price_at_trade=price,
@@ -153,6 +160,7 @@ class BuyCryptoView(APIView):
 #Uses a POST request to send the data to the server
 #The data is validated using the TradeRequestSerializer
 class SellCryptoView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         serializer = TradeRequestSerializer(data = request.data)
         if serializer.is_valid():
@@ -172,19 +180,20 @@ class SellCryptoView(APIView):
 
             revenue = price * amount # calculates the revenue of the trade
             
-            test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
-            if not has_sufficient_balance(test_user, coin, amount):
+            user = request.user
+
+            if not has_sufficient_balance(user, coin, amount):
                 return Response({"error": "Insufficient balance"}, status=400)
 
             try:
-                update_balance(test_user, coin, -amount) # updates the balance of the user by subtracting the amount of the trade
-                update_balance(test_user, "USD", revenue) # updates the balance of the user by adding the revenue of the trade
+                update_balance(user, coin, -amount) # updates the balance of the user by subtracting the amount of the trade
+                update_balance(user, "USD", revenue) # updates the balance of the user by adding the revenue of the trade
             except ValueError as e:
                 return Response({"error": str(e)}, status=400)
 
             #Creates a trade object with data and added to similated database
             trade = Trade.objects.create(
-                user=test_user,
+                user=user,
                 currency=coin,
                 amount=amount,
                 price_at_trade=price,
@@ -198,23 +207,25 @@ class SellCryptoView(APIView):
     
 
 # this class handles the deposit requests
-class DepositView(APIView): 
+class DepositView(APIView):
+    permission_classes = [IsAuthenticated] 
     # it uses a POST request to handle the deposit and validates it using the DepositSerializer
     def post(self, request):
         serializer = DepositSerializer(data=request.data) # creates serializer instance with the data from the request (whcih is amount and currency)
 
         if serializer.is_valid(): 
 
-            test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the deposit
+            user = request.user
 
-            serializer.save(user=test_user, status="completed")  # if data is valid, it saves the deposit and changs status to completed
+
+            serializer.save(user=user, status="completed")  # if data is valid, it saves the deposit and changs status to completed
             
             #Update balance
             currency = serializer.validated_data['currency'] # gets the currency from the validated data
             amount = serializer.validated_data['amount'] # gets the amount from the validated data
             
             try:
-                update_balance(test_user, currency, amount) # updates the balance of the user by adding the amount of the deposit
+                update_balance(user, currency, amount) # updates the balance of the user by adding the amount of the deposit
             except ValueError as e:
                 return Response({"error": str(e)}, status=400)
             
@@ -225,25 +236,27 @@ class DepositView(APIView):
     
 # This class handles withdrawal requests
 class WithdrawalView(APIView): 
+    permission_classes = [IsAuthenticated]
     # all very similar to the deposit view just now for withdrawals
     def post(self, request):
         serializer = WithdrawalSerializer(data=request.data)
 
         if serializer.is_valid():
             
-            test_user, _  = User.objects.get_or_create(username="testuser") # TEST - it gets or creates a test user for testing purposes of the withdrawl
+            user = request.user
+
 
             #Update balance
             currency = serializer.validated_data['currency'] # gets the currency from the validated data
             amount = serializer.validated_data['amount'] # gets the amount from the validated data
             
-            if not has_sufficient_balance(test_user, currency, amount):
+            if not has_sufficient_balance(user, currency, amount):
                 return Response({"error": "Insufficient balance"}, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer.save(user=test_user, status="completed")
+            serializer.save(user=user, status="completed")
             
             try:
-                update_balance(test_user, currency, -amount) # updates the balance of the user by adding the amount of the withdrawl  
+                update_balance(user, currency, -amount) # updates the balance of the user by adding the amount of the withdrawl  
             except ValueError as e:
                 return Response({"error": str(e)}, status=400)
 
@@ -252,6 +265,7 @@ class WithdrawalView(APIView):
 
  
 class AllTransactionsView(APIView): #view returns all deposits and withdrawals in the db table
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         return Response({ 
             "deposits": DepositSerializer(Deposit.objects.all(), many=True).data, # gets records of all deposits, serializes them and returns them in JSON format
@@ -263,9 +277,11 @@ class AllTransactionsView(APIView): #view returns all deposits and withdrawals i
 #This class handles the request to get the trade history
 #Uses a GET request to send the data to the server
 class TradeHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
-        test_user, _  = User.objects.get_or_create(username="testuser")
-        trades = Trade.objects.filter(user=test_user).order_by('-timestamp')
+        user = request.user
+
+        trades = Trade.objects.filter(user=user).order_by('-timestamp')
 
         serializer = TradeSerializer(trades, many=True)
         #Serializes the data using the TradeSerializer
@@ -275,9 +291,11 @@ class TradeHistoryView(APIView):
 
 #This class handles the request to get the balance of a specific cryptocurrency
 class GetBalanceView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
-        test_user, _  = User.objects.get_or_create(username="testuser")
-        balances = MockBalance.objects.filter(user=test_user)
+        user = request.user
+
+        balances = MockBalance.objects.filter(user=user)
         #Gets the balance of the test user from the database
         serializer = MockBalanceSerializer(balances, many=True)
         #Serializes the data using the MockBalanceSerializer
@@ -285,8 +303,10 @@ class GetBalanceView(APIView):
 
 #This class handles the request to set the starting balance for a specific cryptocurrency   
 class StartBalanceView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
-        test_user, _  = User.objects.get_or_create(username="testuser")
+        user = request.user
+
         currency = request.data.get("currency")
         amount = request.data.get("amount")
 
@@ -296,7 +316,7 @@ class StartBalanceView(APIView):
         
         #Checks if the currency is valid (only USD, BTC, ETH, LTC are allowed)
         #If it doesn't exist it creates a new one
-        balance_obj, created = MockBalance.objects.get_or_create(user=test_user, currency=currency.upper(), defaults={"balance":Decimal(amount)})
+        balance_obj, created = MockBalance.objects.get_or_create(user=user, currency=currency.upper(), defaults={"balance":Decimal(amount)})
         
         if not created:
             balance_obj.balance = Decimal(amount)
