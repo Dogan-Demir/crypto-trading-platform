@@ -18,5 +18,5 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('deposit/', DepositView.as_view(), name='deposit'),
     path('balance/', get_balance, name='balance'),
-    path('api/trade/', trade_views.trade, name='trade'),
+    path('trade/', trade_views.trade, name='trade'),
 ]
