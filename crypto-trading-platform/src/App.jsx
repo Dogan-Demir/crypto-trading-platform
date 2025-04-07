@@ -20,27 +20,29 @@ import { AuthProvider } from './AuthContext';
 
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/Account" element={<Account />} />
-        <Route path="/Portfolio" element={<Portfolio />} />
-        <Route path="/Transaction" element={<Transaction />} />
-        <Route path="/Resources" element={<Resources />} />
-        <Route path="/FAQs" element={<FAQs />} />
-        <Route path="/Orders" element={<Orders />} />
-        <Route path="/Settings" element={<Settings />} />
-        <Route path='/FAQsNonMember' element={<FAQs2 />} />
-        <Route path='/Forum' element={<Forum />} />
-        <Route path='/ResourcesNonMember' element={<ResourcesNonMember />} />
-        <Route path='/PriceHistory' element={<PriceHistory />} />
-        <Route path="/deposit" element={<Deposit />} />
-        <Route path="/trading" element={<Trading />} />
-        <Route path="/two-factor-setup" element={<TwoFactorSetup />} />
-      </Routes>
-    </AuthProvider>
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-amber-50 transition-colors duration-200">
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/Account" element={<Account />} />
+          <Route path="/Portfolio" element={<Portfolio />} />
+          <Route path="/Transaction" element={<Transaction />} />
+          <Route path="/Resources" element={<Resources />} />
+          <Route path="/FAQs" element={<FAQs />} />
+          <Route path="/Orders" element={<Orders />} />
+          <Route path="/Settings" element={<Settings />} />
+          <Route path='/FAQsNonMember' element={<FAQs2 />} />
+          <Route path='/Forum' element={<Forum />} />
+          <Route path='/ResourcesNonMember' element={<ResourcesNonMember />} />
+          <Route path='/PriceHistory' element={<PriceHistory />} />
+          <Route path="/deposit" element={<Deposit />} />
+          <Route path="/trading" element={<Trading />} />
+          <Route path="/two-factor-setup" element={<TwoFactorSetup />} />
+        </Routes>
+      </AuthProvider>
+    </div>
   );
 }
 
