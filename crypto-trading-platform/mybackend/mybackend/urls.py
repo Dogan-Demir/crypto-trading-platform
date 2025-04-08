@@ -25,12 +25,11 @@ from two_factor.urls import urlpatterns as tf_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/auth/', include('auth_app.urls')),
+    path('api/', include('auth_app.urls')),
     path('', index, name ='home'),
     path('signup/', SignUpView.as_view(), name ='signup'), 
     path('', include(tf_urls)),
     path('account/', include('account.urls', namespace='account')),
-    path('api/trade/', include('API_logic.urls')),
     path('support/', include('support.urls')),
 ]
     
