@@ -54,7 +54,7 @@ export default function Settings() {
                                     Email
                                 </p>
                                 <p className="">ABC123@outlook.com</p>
-                                <button className={`w-[87px] h-[41px] rounded-3xl ml-[400px] border ${isDarkMode ? 'border-gray-600 hover:bg-blue-600 hover:text-white' : 'border-gray-300 hover:bg-blue-600 hover:text-white'} transition-colors duration-200`}>
+                                <button className={`w-[87px] h-[41px] rounded-3xl ml-[353px] border ${isDarkMode ? 'border-gray-600 hover:bg-blue-600 hover:text-white' : 'border-gray-300 hover:bg-blue-600 hover:text-white'} transition-colors duration-200`}>
                                   <a href="#" className="flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -70,8 +70,8 @@ export default function Settings() {
                                     </svg>
                                     Phone
                                 </p>
-                                <p className="">+44 7771 123123</p>
-                                <button className={`w-[87px] h-[41px] rounded-3xl ml-[446px] border ${isDarkMode ? 'border-gray-600 hover:bg-blue-600 hover:text-white' : 'border-gray-300 hover:bg-blue-600 hover:text-white'} transition-colors duration-200`}>
+                                <p className="w-[200px]">+44 7771 123123</p>
+                                <button className={`w-[87px] h-[41px] rounded-3xl ml-[350px] border ${isDarkMode ? 'border-gray-600 hover:bg-blue-600 hover:text-white' : 'border-gray-300 hover:bg-blue-600 hover:text-white'} transition-colors duration-200`}>
                                   <a href="#" className="flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
