@@ -14,6 +14,7 @@ import Forum from "./Forum";
 import ResourcesNonMember from "./ResourcesNonMember";
 import PriceHistory from "./PriceHistory";
 import Deposit from "./Deposit";
+import SupportTicket from "./SupportTicket";
 import Trading from "./Trading";
 import TradingView from "./TradingView";
 import TwoFactorSetup from "./TwoFactorSetup";
@@ -41,6 +42,7 @@ function App() {
             <Route path='/ResourcesNonMember' element={<ResourcesNonMember />} />
             <Route path='/PriceHistory' element={<PriceHistory />} />
             <Route path="/deposit" element={<Deposit />} />
+            <Route path="/supportTicket" element={<SupportTicket />} />
             <Route path="/trading" element={<TradingView />} />
             <Route path="/trading-legacy" element={<Trading />} />
             <Route path="/two-factor-setup" element={<TwoFactorSetup />} />
