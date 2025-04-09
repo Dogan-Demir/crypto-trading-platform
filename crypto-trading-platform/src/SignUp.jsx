@@ -97,25 +97,25 @@ export default function SignUp() {
                     <input
                         type="text"
                         placeholder="Enter username"
-                        className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] font-medium-small px-4 mb-9 border-2 border-gray-500"
+                        className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] text-black font-medium-small px-4 mb-9 border-2 border-gray-500 placeholder-gray-500"
                         onChange={(e) => setUsername(e.target.value.trim())}
                     />
                     <input
                         type="email"
                         placeholder="Enter email"
-                        className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] font-medium px-4 mb-9"
+                        className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] text-black font-medium px-4 mb-9 placeholder-gray-500"
                         onChange={(e) => setEmail(e.target.value.trim())}
                     />
                     <input
                         type="password"
                         placeholder="Enter password"
-                        className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] font-medium-small px-4 mb-9 border-2 border-gray-500"
+                        className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] text-black font-medium-small px-4 mb-9 border-2 border-gray-500 placeholder-gray-500"
                         onChange={(e) => setPassword(e.target.value.trim())}
                     />
                     <input
                         type="password"
                         placeholder="Confirm password"
-                        className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] font-medium-small px-4 mb-9 border-2 border-gray-500"
+                        className="bg-white w-[409px] h-[48px] rounded-lg text-[25px] text-black font-medium-small px-4 mb-9 border-2 border-gray-500 placeholder-gray-500"
                         onChange={(e) => setConfirmPassword(e.target.value.trim())}
                     />
                     <p className="flex justify-center items-center w-[473px] h-[87px] text-[15px] text-white text-center font-normal mb-7 ">*Please ensure your password contains a minimum of 8 characters, including at least 1 uppercase letter and 1 number</p>
@@ -186,7 +186,7 @@ export default function SignUp() {
                                 placeholder="Enter phone number (e.g., +1234567890)"
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value.trim())}
-                                className="w-full h-[48px] rounded-lg text-[25px] font-medium-small px-4 border-2 border-gray-500"
+                                className="w-full h-[48px] rounded-lg text-[25px] text-black font-medium-small px-4 border-2 border-gray-500 placeholder-gray-500"
                             />
                         </div>
                     )}

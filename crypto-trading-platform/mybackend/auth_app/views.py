@@ -163,8 +163,19 @@ def logout_view(request):
 def get_2fa_method(request):
     user_profile = request.user.userprofile
     
+    # Validate the 2FA method
+    valid_methods = ['TOTP', 'EMAIL', 'SMS']
+    if user_profile.two_factor_method not in valid_methods:
+        return Response({
+            'error': 'Invalid 2FA method',
+            'valid_methods': valid_methods
+        }, status=400)
+    
     if user_profile.two_factor_method == 'TOTP':
-        # Create TOTP device for the user
+        # Delete any existing TOTP devices for this user
+        TOTPDevice.objects.filter(user=request.user).delete()
+        
+        # Create a new TOTP device for the user
         device = TOTPDevice.objects.create(
             user=request.user,
             name='default',
@@ -181,7 +192,8 @@ def get_2fa_method(request):
         
         # Convert to base64
         buffered = BytesIO()
-        img.save(buffered, format="PNG")
+        img.save(buffered)
+        buffered.seek(0)
         qr_code = base64.b64encode(buffered.getvalue()).decode()
         
         return Response({
@@ -228,22 +240,45 @@ def verify_2fa_token(request):
     
     user_profile = request.user.userprofile
     
+    # Validate the 2FA method
+    valid_methods = ['TOTP', 'EMAIL', 'SMS']
+    if user_profile.two_factor_method not in valid_methods:
+        return Response({
+            'detail': 'Invalid 2FA method',
+            'valid_methods': valid_methods
+        }, status=400)
+    
     if user_profile.two_factor_method == 'TOTP':
-        device = TOTPDevice.objects.get(user=request.user, name='default')
-        if device.verify_token(token):
-            return Response({'detail': '2FA setup completed successfully'})
-        else:
-            return Response({'detail': 'Invalid token'}, status=400)
+        # Get the most recently created device or None if none exists
+        try:
+            device = TOTPDevice.objects.filter(user=request.user, name='default').latest('id')
+            if device.verify_token(token):
+                # Set the user's two_factor_enabled to True
+                user_profile.two_factor_enabled = True
+                user_profile.save()
+                return Response({'detail': '2FA setup completed successfully'})
+            else:
+                return Response({'detail': 'Invalid token'}, status=400)
+        except TOTPDevice.DoesNotExist:
+            return Response({'detail': 'TOTP device not found'}, status=400)
     elif user_profile.two_factor_method == 'EMAIL':
+        if not user_profile.email_verification_code:
+            return Response({'detail': 'No verification code found. Please request a new code.'}, status=400)
+            
         if user_profile.email_verification_code == token:
             user_profile.email_verification_code = None
+            user_profile.two_factor_enabled = True
             user_profile.save()
             return Response({'detail': '2FA setup completed successfully'})
         else:
             return Response({'detail': 'Invalid token'}, status=400)
     elif user_profile.two_factor_method == 'SMS':
+        if not user_profile.sms_verification_code:
+            return Response({'detail': 'No verification code found. Please request a new code.'}, status=400)
+            
         if user_profile.sms_verification_code == token:
             user_profile.sms_verification_code = None
+            user_profile.two_factor_enabled = True
             user_profile.save()
             return Response({'detail': '2FA setup completed successfully'})
         else:
