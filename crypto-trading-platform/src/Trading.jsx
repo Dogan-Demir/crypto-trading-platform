@@ -11,6 +11,7 @@ export default function Trading() {
     const [amount, setAmount] = useState('');
     const [tradeType, setTradeType] = useState('BUY');
     const [balance, setBalance] = useState(0);
+    const [portfolio, setPortfolio] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -34,23 +35,77 @@ export default function Trading() {
             const coins = await cryptoAPI.getCoins();
             setCryptocurrencies(coins);
             
-            // Fetch cryptocurrencies from Django backend
-            const dbResponse = await fetch('http://127.0.0.1:8000/api/cryptocurrencies/', {
-                headers: {
-                    'Authorization': `Token ${localStorage.getItem('token')}`
+            try {
+                // Fetch cryptocurrencies from Django backend
+                const dbResponse = await fetch('http://127.0.0.1:8000/api/cryptocurrencies/', {
+                    headers: {
+                        'Authorization': `Token ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (!dbResponse.ok) {
+                    throw new Error('Failed to fetch cryptocurrencies from backend');
                 }
-            });
-            const dbCryptoData = await dbResponse.json();
-            setDbCryptos(dbCryptoData);
+                
+                const dbCryptoData = await dbResponse.json();
+                if (dbCryptoData && dbCryptoData.length > 0) {
+                    setDbCryptos(dbCryptoData);
+                } else {
+                    // If backend returns empty data, create our own DB cryptos from CoinGecko data
+                    const mappedCryptos = coins.slice(0, 20).map((coin, index) => ({
+                        id: index + 1,
+                        name: coin.name,
+                        symbol: coin.symbol,
+                        current_price: coin.current_price
+                    }));
+                    setDbCryptos(mappedCryptos);
+                }
+            } catch (error) {
+                console.error('Error fetching from backend, using CoinGecko data instead:', error);
+                // Map CoinGecko data to expected format for dbCryptos
+                const mappedCryptos = coins.slice(0, 20).map((coin, index) => ({
+                    id: index + 1,
+                    name: coin.name,
+                    symbol: coin.symbol,
+                    current_price: coin.current_price
+                }));
+                setDbCryptos(mappedCryptos);
+            }
             
             // Fetch user's balance
-            const balanceResponse = await fetch('http://127.0.0.1:8000/api/balance/', {
-                headers: {
-                    'Authorization': `Token ${localStorage.getItem('token')}`
+            try {
+                const balanceResponse = await fetch('http://127.0.0.1:8000/api/balance/', {
+                    headers: {
+                        'Authorization': `Token ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (!balanceResponse.ok) {
+                    throw new Error('Failed to fetch balance from backend');
                 }
-            });
-            const balanceData = await balanceResponse.json();
-            setBalance(balanceData.balance);
+                
+                const balanceData = await balanceResponse.json();
+                setBalance(balanceData.balance);
+            } catch (error) {
+                console.error('Error fetching balance, using localStorage:', error);
+                const storedBalance = localStorage.getItem('userBalance');
+                if (storedBalance) {
+                    setBalance(parseFloat(storedBalance));
+                } else {
+                    // Default balance if nothing in localStorage
+                    localStorage.setItem('userBalance', '10000');
+                    setBalance(10000);
+                }
+            }
+            
+            // Fetch user's portfolio
+            try {
+                const portfolioData = await cryptoAPI.getUserPortfolio();
+                setPortfolio(portfolioData);
+            } catch (error) {
+                console.error('Error fetching portfolio:', error);
+                setPortfolio([]);
+            }
             
             setLoading(false);
         } catch (error) {
@@ -61,13 +116,29 @@ export default function Trading() {
     };
 
     const calculateTotal = async () => {
-        const selectedCoin = cryptocurrencies.find(c => 
-            c.symbol.toLowerCase() === dbCryptos.find(dc => dc.id === parseInt(selectedCrypto))?.symbol.toLowerCase()
-        );
-        if (selectedCoin && amount) {
-            const total = selectedCoin.current_price * parseFloat(amount);
-            setCurrentPrice(selectedCoin.current_price);
-            setTotalCost(total);
+        try {
+            const selectedDbCrypto = dbCryptos.find(dc => dc.id === parseInt(selectedCrypto));
+            if (!selectedDbCrypto) return;
+            
+            const selectedCoin = cryptocurrencies.find(c => 
+                c.symbol.toLowerCase() === selectedDbCrypto.symbol.toLowerCase()
+            );
+            
+            if (selectedCoin && amount) {
+                const total = selectedCoin.current_price * parseFloat(amount);
+                setCurrentPrice(selectedCoin.current_price);
+                setTotalCost(total);
+            } else {
+                console.warn('Selected coin not found in market data, using default pricing');
+                // Use a fallback price if coin not found
+                setCurrentPrice(1000); // Default price
+                setTotalCost(1000 * parseFloat(amount || 0));
+            }
+        } catch (error) {
+            console.error('Error calculating total:', error);
+            // Use fallback values on error
+            setCurrentPrice(1000);
+            setTotalCost(1000 * parseFloat(amount || 0));
         }
     };
 
@@ -81,42 +152,59 @@ export default function Trading() {
             return;
         }
 
-        try {
-            const response = await fetch('http://127.0.0.1:8000/api/trade/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Token ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    cryptocurrency_id: selectedCrypto,
-                    amount: parseFloat(amount),
-                    trade_type: tradeType,
-                    price: currentPrice
-                })
-            });
+        // Get selected cryptocurrency data
+        const selectedDbCrypto = dbCryptos.find(dc => dc.id === parseInt(selectedCrypto));
+        if (!selectedDbCrypto) {
+            setError('Selected cryptocurrency not found');
+            return;
+        }
 
-            const data = await response.json();
-
-            if (response.ok) {
-                setSuccess(`${tradeType} order executed successfully!`);
-                setAmount('');
-                fetchData(); // Refresh balance and data
-            } else {
-                setError(data.detail || 'Trade failed');
+        // For SELL orders, check if user has enough of the cryptocurrency
+        if (tradeType === 'SELL') {
+            try {
+                const portfolio = await cryptoAPI.getUserPortfolio();
+                const holding = portfolio.find(
+                    item => item.cryptocurrency_symbol.toLowerCase() === selectedDbCrypto.symbol.toLowerCase()
+                );
+                
+                if (!holding || parseFloat(holding.amount) < parseFloat(amount)) {
+                    setError(`You don't have enough ${selectedDbCrypto.symbol.toUpperCase()} to sell. Current balance: ${holding ? holding.amount : 0}`);
+                    return;
+                }
+            } catch (err) {
+                console.error('Error checking portfolio:', err);
             }
+        }
+
+        try {
+            // Use the cryptoAPI service to execute the trade
+            const tradeData = {
+                cryptocurrency_id: selectedCrypto,
+                amount: parseFloat(amount),
+                trade_type: tradeType,
+                price: currentPrice || 0,
+                currency: selectedDbCrypto.symbol.toLowerCase() // Add the symbol for local storage fallback
+            };
+            
+            await cryptoAPI.executeTrade(tradeData);
+            
+            setSuccess(`${tradeType} order executed successfully!`);
+            setAmount('');
+            
+            // Refresh balance and data
+            fetchData();
         } catch (err) {
-            setError('Network error. Please try again.');
+            setError(err.message || 'Network error. Please try again.');
             console.error('Trade error:', err);
         }
     };
 
     if (loading) {
         return (
-            <div className="flex min-h-screen bg-lightMode-background dark:bg-[#0F1429]">
+            <div className={`flex min-h-screen ${isDarkMode ? 'bg-[#0F1429]' : 'bg-gray-100'}`}>
                 <NavBar2 />
                 <main className="flex-1 ml-[398px]">
-                    <div className="min-h-screen text-lightText-primary dark:text-white p-8">
+                    <div className={`min-h-screen ${isDarkMode ? 'text-white' : 'text-gray-900'} p-8`}>
                         <h1 className="text-2xl">Loading...</h1>
                     </div>
                 </main>
@@ -125,26 +213,53 @@ export default function Trading() {
     }
 
     return (
-        <div className="flex min-h-screen bg-lightMode-background dark:bg-[#0F1429]">
+        <div className={`flex min-h-screen ${isDarkMode ? 'bg-[#0F1429]' : 'bg-gray-100'}`}>
             <NavBar2 />
             <main className="flex-1 ml-[398px]">
-                <div className="min-h-screen text-lightText-primary dark:text-white bg-no-repeat bg-cover relative transition-colors duration-200"
+                <div className={`min-h-screen ${isDarkMode ? 'text-white' : 'text-gray-900'} bg-no-repeat bg-cover relative`}
                      style={{ 
-                         background: isDarkMode ? `url(${bgImage})` : 'var(--tw-color-lightMode-background, #ffffff)',
+                         background: isDarkMode ? `url(${bgImage})` : undefined,
                          backgroundPosition: 'center',
                          backgroundSize: 'cover'
                      }}>
                     <div className="p-8">
                         <h1 className="text-[40px] mb-6">Trading</h1>
 
-                        {/* Balance Display */}
-                        <div className="bg-lightMode-card dark:bg-gray-800/50 shadow-md backdrop-blur-sm rounded-lg p-6 mb-6">
-                            <h2 className="text-lightText-secondary dark:text-gray-400 mb-2">Available Balance</h2>
-                            <p className="text-2xl font-bold">£{balance.toFixed(2)}</p>
+                        {/* Balance and Portfolio Summary */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            {/* Balance Display */}
+                            <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-lg'} rounded-lg p-6`}>
+                                <h2 className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>Available Balance</h2>
+                                <p className="text-2xl font-bold">£{balance.toFixed(2)}</p>
+                            </div>
+                            
+                            {/* Portfolio Summary */}
+                            <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-lg'} rounded-lg p-6`}>
+                                <h2 className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>Portfolio Summary</h2>
+                                {portfolio.length > 0 ? (
+                                    <div className="space-y-2">
+                                        {portfolio.map((item, index) => {
+                                            const crypto = cryptocurrencies.find(c => 
+                                                c.symbol.toLowerCase() === item.cryptocurrency_symbol.toLowerCase()
+                                            );
+                                            const value = crypto ? crypto.current_price * item.amount : 0;
+                                            
+                                            return (
+                                                <div key={index} className="flex justify-between items-center">
+                                                    <span>{item.cryptocurrency_symbol.toUpperCase()}</span>
+                                                    <span className="font-medium">{parseFloat(item.amount).toFixed(6)} (£{value.toFixed(2)})</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <p>No assets in portfolio</p>
+                                )}
+                            </div>
                         </div>
 
                         {/* Trading Form */}
-                        <div className="bg-lightMode-card dark:bg-gray-800/50 shadow-md backdrop-blur-sm rounded-lg p-6">
+                        <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-lg'} rounded-lg p-6`}>
                             <form onSubmit={handleTrade} className="space-y-6">
                                 {/* Trade Type Selection */}
                                 <div className="flex space-x-4 mb-6">
@@ -152,8 +267,8 @@ export default function Trading() {
                                         type="button"
                                         className={`flex-1 py-3 rounded-lg ${
                                             tradeType === 'BUY'
-                                                ? 'bg-green-600 dark:bg-green-600 text-white'
-                                                : 'bg-lightMode-secondary dark:bg-gray-700/50 text-lightText-secondary dark:text-gray-300'
+                                                ? 'bg-green-600 text-white'
+                                                : `${isDarkMode ? 'bg-gray-700/50 text-gray-300' : 'bg-gray-200 text-gray-700'}`
                                         }`}
                                         onClick={() => setTradeType('BUY')}
                                     >
@@ -164,7 +279,7 @@ export default function Trading() {
                                         className={`flex-1 py-3 rounded-lg ${
                                             tradeType === 'SELL'
                                                 ? 'bg-red-600 text-white'
-                                                : 'bg-lightMode-secondary dark:bg-gray-700/50 text-lightText-secondary dark:text-gray-300'
+                                                : `${isDarkMode ? 'bg-gray-700/50 text-gray-300' : 'bg-gray-200 text-gray-700'}`
                                         }`}
                                         onClick={() => setTradeType('SELL')}
                                     >
@@ -174,11 +289,15 @@ export default function Trading() {
 
                                 {/* Cryptocurrency Selection */}
                                 <div>
-                                    <label className="block text-lightText-secondary dark:text-gray-400 mb-2">Select Cryptocurrency</label>
+                                    <label className={`block ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>Select Cryptocurrency</label>
                                     <select
                                         value={selectedCrypto}
                                         onChange={(e) => setSelectedCrypto(e.target.value)}
-                                        className="w-full bg-white dark:bg-gray-700/50 text-lightText-primary dark:text-white border border-gray-300 dark:border-transparent px-4 py-2 rounded-lg"
+                                        className={`w-full px-4 py-2 rounded-lg ${
+                                            isDarkMode 
+                                                ? 'bg-gray-700/50 text-white border-transparent' 
+                                                : 'bg-white text-gray-900 border border-gray-300'
+                                        }`}
                                         required
                                     >
                                         <option value="">Select a cryptocurrency</option>
@@ -198,12 +317,16 @@ export default function Trading() {
 
                                 {/* Amount Input */}
                                 <div>
-                                    <label className="block text-lightText-secondary dark:text-gray-400 mb-2">Amount</label>
+                                    <label className={`block ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>Amount</label>
                                     <input
                                         type="number"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
-                                        className="w-full bg-white dark:bg-gray-700/50 text-lightText-primary dark:text-white border border-gray-300 dark:border-transparent px-4 py-2 rounded-lg"
+                                        className={`w-full px-4 py-2 rounded-lg ${
+                                            isDarkMode 
+                                                ? 'bg-gray-700/50 text-white border-transparent' 
+                                                : 'bg-white text-gray-900 border border-gray-300'
+                                        }`}
                                         placeholder="Enter amount"
                                         min="0"
                                         step="any"
@@ -213,9 +336,9 @@ export default function Trading() {
 
                                 {/* Total Cost/Value Display */}
                                 {selectedCrypto && amount && (
-                                    <div className="p-4 bg-lightMode-secondary/50 dark:bg-gray-700/50 rounded-lg">
+                                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
                                         <div className="flex justify-between mb-2">
-                                            <span className="text-lightText-secondary dark:text-gray-400">Price per unit:</span>
+                                            <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Price per unit:</span>
                                             <span>£{currentPrice?.toFixed(2) || '0.00'}</span>
                                         </div>
                                         <div className="flex justify-between font-bold">
@@ -226,8 +349,8 @@ export default function Trading() {
                                 )}
 
                                 {/* Error and Success Messages */}
-                                {error && <div className="text-red-600 dark:text-red-500 p-3 bg-red-100 dark:bg-red-900/20 rounded">{error}</div>}
-                                {success && <div className="text-green-600 dark:text-green-500 p-3 bg-green-100 dark:bg-green-900/20 rounded">{success}</div>}
+                                {error && <div className={`p-3 rounded ${isDarkMode ? 'bg-red-900/20 text-red-500' : 'bg-red-100 text-red-600'}`}>{error}</div>}
+                                {success && <div className={`p-3 rounded ${isDarkMode ? 'bg-green-900/20 text-green-500' : 'bg-green-100 text-green-600'}`}>{success}</div>}
 
                                 {/* Submit Button */}
                                 <button

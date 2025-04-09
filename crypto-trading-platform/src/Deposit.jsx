@@ -63,19 +63,19 @@ export default function Deposit() {
     };
 
     return (
-        <div className="flex min-h-screen bg-lightMode-background dark:bg-[#0F1429]">
+        <div className={`flex min-h-screen ${isDarkMode ? 'bg-[#0F1429]' : 'bg-gray-100'}`}>
             <NavBar2 />
             <main className="flex-1 ml-[398px]">
-                <div className="min-h-screen text-lightText-primary dark:text-white bg-no-repeat bg-cover relative transition-colors duration-200"
+                <div className={`min-h-screen ${isDarkMode ? 'text-white' : 'text-gray-900'} bg-no-repeat bg-cover relative transition-colors duration-200`}
                     style={{ 
-                        background: isDarkMode ? `url(${bgImage})` : 'var(--tw-color-lightMode-background, #ffffff)',
+                        background: isDarkMode ? `url(${bgImage})` : undefined,
                         backgroundPosition: 'center',
                         backgroundSize: 'cover'
                     }}>
                     <div className="p-8">
                         <h1 className="text-[40px] mb-6">Deposit Funds</h1>
                         
-                        <div className="w-[933px] h-auto border border-gray-200 dark:border-gray-700 rounded-3xl p-6 backdrop-blur-sm bg-lightMode-card dark:bg-gray-800/50 shadow-md">
+                        <div className={`w-[933px] h-auto rounded-3xl p-6 ${isDarkMode ? 'border-gray-700 bg-black/20' : 'border-gray-200 bg-white'} border shadow-lg`}>
                             <div className="mb-6">
                                 <h2 className="text-2xl mb-2">Current Balance</h2>
                                 <p className="text-3xl font-bold">£{balance}</p>
@@ -88,20 +88,20 @@ export default function Deposit() {
                                         type="number"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
-                                        className={`w-full p-2 rounded ${isDarkMode 
-                                            ? 'bg-gray-700 text-white' 
+                                        className={`w-full p-3 rounded-lg ${isDarkMode 
+                                            ? 'bg-gray-700/50 border-transparent text-white' 
                                             : 'bg-white border border-gray-300 text-gray-900'}`}
                                         min="0"
                                         step="0.01"
                                     />
                                 </div>
 
-                                {error && <div className="text-red-600 dark:text-red-500">{error}</div>}
-                                {success && <div className="text-green-600 dark:text-green-500">{success}</div>}
+                                {error && <div className={`p-3 rounded ${isDarkMode ? 'bg-red-900/20 text-red-500' : 'bg-red-100 text-red-600'}`}>{error}</div>}
+                                {success && <div className={`p-3 rounded ${isDarkMode ? 'bg-green-900/20 text-green-500' : 'bg-green-100 text-green-600'}`}>{success}</div>}
 
                                 <button
                                     type="submit"
-                                    className="bg-button-light dark:bg-blue-600 text-white px-6 py-2 rounded hover:bg-button-light/90 dark:hover:bg-blue-700 transition-colors duration-200"
+                                    className={`${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-primary-light hover:bg-blue-700'} text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200`}
                                 >
                                     Deposit
                                 </button>
