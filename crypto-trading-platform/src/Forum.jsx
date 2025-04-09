@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import NavBar2 from "./NavBar2";
 import bgImage from "./assets/Background-dark.png";
 import { Link } from "react-router-dom";
+import { useTheme } from './ThemeContext';
 
 export default function Forum() {
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const { isDarkMode } = useTheme();
 
     const forumPosts = [
         {
@@ -68,19 +70,19 @@ export default function Forum() {
         : forumPosts.filter(post => post.category === selectedCategory);
 
     return (
-        <div className="flex min-h-screen bg-[#0F1429]">
+        <div className="flex min-h-screen bg-lightMode-background dark:bg-[#0F1429]">
             <NavBar2 />
             <main className="flex-1 ml-[398px]">
-                <div className="min-h-screen text-white bg-no-repeat bg-cover relative"
+                <div className="min-h-screen text-lightText-primary dark:text-white bg-no-repeat bg-cover relative transition-colors duration-200"
                      style={{ 
-                         background: `url(${bgImage})`,
+                         background: isDarkMode ? `url(${bgImage})` : 'var(--tw-color-lightMode-background, #ffffff)',
                          backgroundPosition: 'center',
                          backgroundSize: 'cover'
                      }}>
                     <div className="p-8">
                         <div className="flex justify-between items-center mb-6">
                             <h1 className="text-[40px]">Forum</h1>
-                            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                            <button className="bg-button-light dark:bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-button-light/90 dark:hover:bg-blue-700 transition-colors duration-200">
                                 New Post
                             </button>
                         </div>
@@ -92,8 +94,8 @@ export default function Forum() {
                                     key={category.id}
                                     className={`px-4 py-2 rounded-full whitespace-nowrap ${
                                         selectedCategory === category.id
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50'
+                                            ? 'bg-button-light dark:bg-blue-600 text-white'
+                                            : 'bg-lightMode-secondary dark:bg-gray-800/50 text-lightText-secondary dark:text-gray-300 hover:bg-lightMode-card dark:hover:bg-gray-700/50'
                                     }`}
                                     onClick={() => setSelectedCategory(category.id)}
                                 >
@@ -103,8 +105,8 @@ export default function Forum() {
                         </div>
 
                         {/* Forum Posts */}
-                        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg overflow-hidden">
-                            <div className="grid grid-cols-[1fr,auto,auto,auto] gap-4 px-6 py-3 bg-gray-700/50 text-sm font-medium">
+                        <div className="bg-lightMode-card dark:bg-gray-800/50 shadow-md backdrop-blur-sm rounded-lg overflow-hidden">
+                            <div className="grid grid-cols-[1fr,auto,auto,auto] gap-4 px-6 py-3 bg-lightMode-secondary dark:bg-gray-700/50 text-sm font-medium">
                                 <div>Topic</div>
                                 <div>Replies</div>
                                 <div>Views</div>
@@ -114,19 +116,19 @@ export default function Forum() {
                             {filteredPosts.map(post => (
                                 <div 
                                     key={post.id}
-                                    className="grid grid-cols-[1fr,auto,auto,auto] gap-4 px-6 py-4 border-t border-gray-700/50 hover:bg-gray-700/30"
+                                    className="grid grid-cols-[1fr,auto,auto,auto] gap-4 px-6 py-4 border-t border-gray-200 dark:border-gray-700/50 hover:bg-lightMode-secondary/50 dark:hover:bg-gray-700/30"
                                 >
                                     <div>
                                         <h3 className="font-medium mb-1">
-                                            <Link to={`/forum/post/${post.id}`} className="hover:text-blue-400">
+                                            <Link to={`/forum/post/${post.id}`} className="hover:text-button-light dark:hover:text-blue-400 transition-colors duration-200">
                                                 {post.title}
                                             </Link>
                                         </h3>
-                                        <p className="text-sm text-gray-400">by {post.author}</p>
+                                        <p className="text-sm text-lightText-secondary dark:text-gray-400">by {post.author}</p>
                                     </div>
                                     <div className="text-center">{post.replies}</div>
                                     <div className="text-center">{post.views}</div>
-                                    <div className="text-sm text-gray-400">{post.lastActivity}</div>
+                                    <div className="text-sm text-lightText-secondary dark:text-gray-400">{post.lastActivity}</div>
                                 </div>
                             ))}
                         </div>

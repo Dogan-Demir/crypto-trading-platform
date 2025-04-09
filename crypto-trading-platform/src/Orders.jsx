@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import NavBar2 from "./NavBar2";
 import bgImage from "./assets/Background-dark.png";
+import { useTheme } from './ThemeContext';
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
     const [activeTab, setActiveTab] = useState('open');
     const [loading, setLoading] = useState(true);
+    const { isDarkMode } = useTheme();
 
     useEffect(() => {
         fetchOrders();
@@ -34,22 +36,22 @@ export default function Orders() {
     const getStatusColor = (status) => {
         switch (status.toLowerCase()) {
             case 'completed':
-                return 'text-green-500';
+                return isDarkMode ? 'text-green-500' : 'text-green-600';
             case 'cancelled':
-                return 'text-red-500';
+                return isDarkMode ? 'text-red-500' : 'text-red-600';
             case 'pending':
-                return 'text-yellow-500';
+                return isDarkMode ? 'text-yellow-500' : 'text-yellow-600';
             default:
-                return 'text-gray-500';
+                return isDarkMode ? 'text-gray-400' : 'text-gray-500';
         }
     };
 
     if (loading) {
         return (
-            <div className="flex min-h-screen bg-[#0F1429]">
+            <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
                 <NavBar2 />
                 <main className="flex-1 ml-[398px]">
-                    <div className="min-h-screen text-white p-8">
+                    <div className="p-8">
                         <h1 className="text-2xl">Loading...</h1>
                     </div>
                 </main>
@@ -58,12 +60,12 @@ export default function Orders() {
     }
 
     return (
-        <div className="flex min-h-screen bg-[#0F1429]">
+        <div className={`flex min-h-screen ${isDarkMode ? 'bg-[#0F1429]' : 'bg-gray-100'}`}>
             <NavBar2 />
             <main className="flex-1 ml-[398px]">
-                <div className="min-h-screen text-white bg-no-repeat bg-cover relative"
+                <div className={`min-h-screen ${isDarkMode ? 'text-white' : 'text-gray-900'} bg-no-repeat bg-cover relative`}
                      style={{ 
-                         background: `url(${bgImage})`,
+                         background: isDarkMode ? `url(${bgImage})` : undefined,
                          backgroundPosition: 'center',
                          backgroundSize: 'cover'
                      }}>
@@ -76,7 +78,7 @@ export default function Orders() {
                                 className={`px-6 py-2 rounded-lg ${
                                     activeTab === 'open'
                                         ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50'
+                                        : `${isDarkMode ? 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`
                                 }`}
                                 onClick={() => setActiveTab('open')}
                             >
@@ -86,7 +88,7 @@ export default function Orders() {
                                 className={`px-6 py-2 rounded-lg ${
                                     activeTab === 'history'
                                         ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50'
+                                        : `${isDarkMode ? 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`
                                 }`}
                                 onClick={() => setActiveTab('history')}
                             >
@@ -95,9 +97,9 @@ export default function Orders() {
                         </div>
 
                         {/* Orders Table */}
-                        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg overflow-hidden">
+                        <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} rounded-lg overflow-hidden`}>
                             <table className="w-full">
-                                <thead className="bg-gray-700/50">
+                                <thead className={`${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
                                     <tr>
                                         <th className="px-6 py-3 text-left">Date</th>
                                         <th className="px-6 py-3 text-left">Type</th>
@@ -111,10 +113,12 @@ export default function Orders() {
                                 <tbody>
                                     {orders.length > 0 ? (
                                         orders.map((order, index) => (
-                                            <tr key={index} className="border-t border-gray-700/50">
+                                            <tr key={index} className={`border-t ${isDarkMode ? 'border-gray-700/50' : 'border-gray-200'}`}>
                                                 <td className="px-6 py-4">{formatDate(order.date)}</td>
                                                 <td className={`px-6 py-4 ${
-                                                    order.type === 'BUY' ? 'text-green-500' : 'text-red-500'
+                                                    order.type === 'BUY' 
+                                                        ? 'text-green-600 dark:text-green-500' 
+                                                        : 'text-red-600 dark:text-red-500'
                                                 }`}>
                                                     {order.type}
                                                 </td>
@@ -129,7 +133,7 @@ export default function Orders() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-4 text-center text-gray-400">
+                                            <td colSpan="7" className={`px-6 py-4 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                                 No orders found
                                             </td>
                                         </tr>

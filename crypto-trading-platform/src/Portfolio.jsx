@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import NavBar2 from "./NavBar2";
 import bgImage from "./assets/Background-dark.png";
 import { Link } from 'react-router-dom';
+import { useTheme } from './ThemeContext';
 
 export default function Portfolio() {
     const [portfolio, setPortfolio] = useState([]);
     const [balance, setBalance] = useState(0);
     const [totalValue, setTotalValue] = useState(0);
     const [loading, setLoading] = useState(true);
+    const { isDarkMode } = useTheme();
 
     useEffect(() => {
         fetchPortfolioData();
@@ -81,7 +83,7 @@ export default function Portfolio() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-900 text-white">
+            <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
                 <NavBar2 />
                 <div className="ml-[398px] p-8">
                     <h1 className="text-2xl">Loading...</h1>
@@ -91,12 +93,12 @@ export default function Portfolio() {
     }
 
     return (
-        <div className="flex min-h-screen bg-[#0F1429]">
+        <div className={`flex min-h-screen ${isDarkMode ? 'bg-[#0F1429]' : 'bg-gray-100'}`}>
             <NavBar2 />
             <main className="flex-1 ml-[398px]">
-                <div className="min-h-screen text-white bg-no-repeat bg-cover relative"
+                <div className={`min-h-screen ${isDarkMode ? 'text-white' : 'text-gray-900'} bg-no-repeat bg-cover relative`}
                      style={{ 
-                         background: `url(${bgImage})`,
+                         background: isDarkMode ? `url(${bgImage})` : undefined,
                          backgroundPosition: 'center',
                          backgroundSize: 'cover'
                      }}>
@@ -105,24 +107,24 @@ export default function Portfolio() {
 
                         {/* Summary Cards */}
                         <div className="grid grid-cols-3 gap-6 mb-8">
-                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg">
-                                <h3 className="text-gray-400 mb-2">Available Balance</h3>
+                            <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} p-6 rounded-lg`}>
+                                <h3 className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>Available Balance</h3>
                                 <p className="text-2xl font-bold">£{balance.toFixed(2)}</p>
                             </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg">
-                                <h3 className="text-gray-400 mb-2">Portfolio Value</h3>
+                            <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} p-6 rounded-lg`}>
+                                <h3 className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>Portfolio Value</h3>
                                 <p className="text-2xl font-bold">£{totalValue.toFixed(2)}</p>
                             </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-lg">
-                                <h3 className="text-gray-400 mb-2">Total Assets</h3>
+                            <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} p-6 rounded-lg`}>
+                                <h3 className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-2`}>Total Assets</h3>
                                 <p className="text-2xl font-bold">£{(balance + totalValue).toFixed(2)}</p>
                             </div>
                         </div>
 
                         {/* Portfolio Table */}
-                        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg overflow-x-auto">
+                        <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} rounded-lg overflow-x-auto`}>
                             <table className="w-full">
-                                <thead className="bg-gray-700/50">
+                                <thead className={`${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-50'}`}>
                                     <tr>
                                         <th className="px-6 py-3 text-left">Asset</th>
                                         <th className="px-6 py-3 text-right">Holdings</th>
@@ -132,7 +134,7 @@ export default function Portfolio() {
                                 </thead>
                                 <tbody>
                                     {portfolio.map((item, index) => (
-                                        <tr key={index} className="border-t border-gray-700/50">
+                                        <tr key={index} className={`border-t ${isDarkMode ? 'border-gray-700/50' : 'border-gray-200'}`}>
                                             <td className="px-6 py-4">
                                                 {item.cryptocurrency_symbol}
                                             </td>
@@ -149,7 +151,7 @@ export default function Portfolio() {
                                     ))}
                                     {portfolio.length === 0 && (
                                         <tr>
-                                            <td colSpan="4" className="px-6 py-4 text-center text-gray-400">
+                                            <td colSpan="4" className={`px-6 py-4 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                                 No assets in portfolio. Start trading to build your portfolio!
                                             </td>
                                         </tr>
@@ -162,13 +164,13 @@ export default function Portfolio() {
                         <div className="mt-6 flex gap-4">
                             <Link 
                                 to="/trading"
-                                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors duration-200"
                             >
                                 Trade
                             </Link>
                             <Link 
                                 to="/deposit"
-                                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+                                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition-colors duration-200"
                             >
                                 Deposit
                             </Link>

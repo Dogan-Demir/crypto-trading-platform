@@ -3,6 +3,7 @@ import NavBar2 from "./NavBar2";
 import bgImage from "./assets/Background-dark.png";
 import { Line } from 'react-chartjs-2';
 import { cryptoAPI } from './services/cryptoAPI';
+import { useTheme } from './ThemeContext';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -34,6 +35,7 @@ export default function PriceHistory() {
     const [priceChange, setPriceChange] = useState(null);
     const [high24h, setHigh24h] = useState(null);
     const [low24h, setLow24h] = useState(null);
+    const { isDarkMode } = useTheme();
 
     const timeframes = [
         { value: '1', label: '24 Hours' },
@@ -127,10 +129,10 @@ export default function PriceHistory() {
         scales: {
             y: {
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.1)',
+                    color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                 },
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
                     callback: function(value) {
                         return '£' + value.toFixed(2);
                     }
@@ -138,10 +140,10 @@ export default function PriceHistory() {
             },
             x: {
                 grid: {
-                    color: 'rgba(255, 255, 255, 0.1)',
+                    color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                 },
                 ticks: {
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)',
                     maxRotation: 45,
                     minRotation: 45
                 }
@@ -150,12 +152,12 @@ export default function PriceHistory() {
     };
 
     return (
-        <div className="flex min-h-screen bg-[#0F1429]">
+        <div className={`flex min-h-screen ${isDarkMode ? 'bg-[#0F1429]' : 'bg-gray-100'}`}>
             <NavBar2 />
             <main className="flex-1 ml-[398px]">
-                <div className="min-h-screen text-white bg-no-repeat bg-cover relative"
+                <div className={`min-h-screen ${isDarkMode ? 'text-white' : 'text-gray-900'} bg-no-repeat bg-cover relative`}
                      style={{ 
-                         background: `url(${bgImage})`,
+                         background: isDarkMode ? `url(${bgImage})` : undefined,
                          backgroundPosition: 'center',
                          backgroundSize: 'cover'
                      }}>
@@ -167,7 +169,7 @@ export default function PriceHistory() {
                             <select
                                 value={selectedCrypto}
                                 onChange={(e) => setSelectedCrypto(e.target.value)}
-                                className="bg-gray-800/50 text-white px-4 py-2 rounded-lg"
+                                className={`${isDarkMode ? 'bg-gray-800/50 text-white' : 'bg-white border border-gray-300 text-gray-900'} px-4 py-2 rounded-lg`}
                             >
                                 {coins.map(coin => (
                                     <option key={coin.id} value={coin.id}>
@@ -183,7 +185,7 @@ export default function PriceHistory() {
                                         className={`px-4 py-2 ${
                                             timeframe === tf.value
                                                 ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50'
+                                                : `${isDarkMode ? 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`
                                         }`}
                                         onClick={() => setTimeframe(tf.value)}
                                     >
@@ -194,47 +196,49 @@ export default function PriceHistory() {
                         </div>
 
                         {/* Chart */}
-                        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6">
+                        <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} rounded-lg p-6`}>
                             <div className="h-[500px]">
                                 {loading ? (
                                     <div className="flex items-center justify-center h-full">
-                                        <p>Loading chart data...</p>
+                                        <div className="text-xl">Loading chart data...</div>
                                     </div>
+                                ) : priceData ? (
+                                    <Line data={priceData} options={chartOptions} />
                                 ) : (
-                                    priceData && <Line data={priceData} options={chartOptions} />
+                                    <div className="flex items-center justify-center h-full">
+                                        <div className="text-xl">No price data available</div>
+                                    </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* Price Statistics */}
-                        <div className="grid grid-cols-4 gap-4 mt-6">
-                            <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4">
-                                <h3 className="text-gray-400 mb-2">Current Price</h3>
-                                <p className="text-2xl font-bold">
-                                    £{currentPrice?.toFixed(2) || '---'}
-                                </p>
+                        {/* Price Stats */}
+                        {currentPrice && (
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+                                <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} p-4 rounded-lg`}>
+                                    <h3 className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>Current Price</h3>
+                                    <p className="text-2xl font-bold">£{currentPrice.toFixed(2)}</p>
+                                </div>
+                                <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} p-4 rounded-lg`}>
+                                    <h3 className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>24h Change</h3>
+                                    <p className={`text-2xl font-bold ${
+                                        priceChange > 0 
+                                            ? 'text-green-600 dark:text-green-500' 
+                                            : 'text-red-600 dark:text-red-500'
+                                    }`}>
+                                        {priceChange > 0 ? '+' : ''}{priceChange?.toFixed(2)}%
+                                    </p>
+                                </div>
+                                <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} p-4 rounded-lg`}>
+                                    <h3 className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>24h High</h3>
+                                    <p className="text-2xl font-bold">£{high24h?.toFixed(2)}</p>
+                                </div>
+                                <div className={`${isDarkMode ? 'bg-gray-800/50 backdrop-blur-sm' : 'bg-white shadow-md'} p-4 rounded-lg`}>
+                                    <h3 className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-1`}>24h Low</h3>
+                                    <p className="text-2xl font-bold">£{low24h?.toFixed(2)}</p>
+                                </div>
                             </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4">
-                                <h3 className="text-gray-400 mb-2">24h Change</h3>
-                                <p className={`text-2xl font-bold ${
-                                    priceChange > 0 ? 'text-green-500' : 'text-red-500'
-                                }`}>
-                                    {priceChange ? `${priceChange.toFixed(2)}%` : '---'}
-                                </p>
-                            </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4">
-                                <h3 className="text-gray-400 mb-2">24h High</h3>
-                                <p className="text-2xl font-bold">
-                                    £{high24h?.toFixed(2) || '---'}
-                                </p>
-                            </div>
-                            <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4">
-                                <h3 className="text-gray-400 mb-2">24h Low</h3>
-                                <p className="text-2xl font-bold">
-                                    £{low24h?.toFixed(2) || '---'}
-                                </p>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </main>

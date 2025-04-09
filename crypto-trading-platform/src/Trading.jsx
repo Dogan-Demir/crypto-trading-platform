@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import NavBar2 from "./NavBar2";
 import bgImage from "./assets/Background-dark.png";
 import { cryptoAPI } from './services/cryptoAPI';
+import { useTheme } from './ThemeContext';
 
 export default function Trading() {
     const [cryptocurrencies, setCryptocurrencies] = useState([]);
@@ -15,6 +16,7 @@ export default function Trading() {
     const [success, setSuccess] = useState('');
     const [currentPrice, setCurrentPrice] = useState(null);
     const [totalCost, setTotalCost] = useState(0);
+    const { isDarkMode } = useTheme();
 
     useEffect(() => {
         fetchData();
@@ -111,10 +113,10 @@ export default function Trading() {
 
     if (loading) {
         return (
-            <div className="flex min-h-screen bg-[#0F1429]">
+            <div className="flex min-h-screen bg-lightMode-background dark:bg-[#0F1429]">
                 <NavBar2 />
                 <main className="flex-1 ml-[398px]">
-                    <div className="min-h-screen text-white p-8">
+                    <div className="min-h-screen text-lightText-primary dark:text-white p-8">
                         <h1 className="text-2xl">Loading...</h1>
                     </div>
                 </main>
@@ -123,12 +125,12 @@ export default function Trading() {
     }
 
     return (
-        <div className="flex min-h-screen bg-[#0F1429]">
+        <div className="flex min-h-screen bg-lightMode-background dark:bg-[#0F1429]">
             <NavBar2 />
             <main className="flex-1 ml-[398px]">
-                <div className="min-h-screen text-white bg-no-repeat bg-cover relative"
+                <div className="min-h-screen text-lightText-primary dark:text-white bg-no-repeat bg-cover relative transition-colors duration-200"
                      style={{ 
-                         background: `url(${bgImage})`,
+                         background: isDarkMode ? `url(${bgImage})` : 'var(--tw-color-lightMode-background, #ffffff)',
                          backgroundPosition: 'center',
                          backgroundSize: 'cover'
                      }}>
@@ -136,13 +138,13 @@ export default function Trading() {
                         <h1 className="text-[40px] mb-6">Trading</h1>
 
                         {/* Balance Display */}
-                        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 mb-6">
-                            <h2 className="text-gray-400 mb-2">Available Balance</h2>
+                        <div className="bg-lightMode-card dark:bg-gray-800/50 shadow-md backdrop-blur-sm rounded-lg p-6 mb-6">
+                            <h2 className="text-lightText-secondary dark:text-gray-400 mb-2">Available Balance</h2>
                             <p className="text-2xl font-bold">£{balance.toFixed(2)}</p>
                         </div>
 
                         {/* Trading Form */}
-                        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6">
+                        <div className="bg-lightMode-card dark:bg-gray-800/50 shadow-md backdrop-blur-sm rounded-lg p-6">
                             <form onSubmit={handleTrade} className="space-y-6">
                                 {/* Trade Type Selection */}
                                 <div className="flex space-x-4 mb-6">
@@ -150,8 +152,8 @@ export default function Trading() {
                                         type="button"
                                         className={`flex-1 py-3 rounded-lg ${
                                             tradeType === 'BUY'
-                                                ? 'bg-green-600 text-white'
-                                                : 'bg-gray-700/50 text-gray-300'
+                                                ? 'bg-green-600 dark:bg-green-600 text-white'
+                                                : 'bg-lightMode-secondary dark:bg-gray-700/50 text-lightText-secondary dark:text-gray-300'
                                         }`}
                                         onClick={() => setTradeType('BUY')}
                                     >
@@ -162,7 +164,7 @@ export default function Trading() {
                                         className={`flex-1 py-3 rounded-lg ${
                                             tradeType === 'SELL'
                                                 ? 'bg-red-600 text-white'
-                                                : 'bg-gray-700/50 text-gray-300'
+                                                : 'bg-lightMode-secondary dark:bg-gray-700/50 text-lightText-secondary dark:text-gray-300'
                                         }`}
                                         onClick={() => setTradeType('SELL')}
                                     >
@@ -172,11 +174,11 @@ export default function Trading() {
 
                                 {/* Cryptocurrency Selection */}
                                 <div>
-                                    <label className="block text-gray-400 mb-2">Select Cryptocurrency</label>
+                                    <label className="block text-lightText-secondary dark:text-gray-400 mb-2">Select Cryptocurrency</label>
                                     <select
                                         value={selectedCrypto}
                                         onChange={(e) => setSelectedCrypto(e.target.value)}
-                                        className="w-full bg-gray-700/50 text-white px-4 py-2 rounded-lg"
+                                        className="w-full bg-white dark:bg-gray-700/50 text-lightText-primary dark:text-white border border-gray-300 dark:border-transparent px-4 py-2 rounded-lg"
                                         required
                                     >
                                         <option value="">Select a cryptocurrency</option>
@@ -196,54 +198,47 @@ export default function Trading() {
 
                                 {/* Amount Input */}
                                 <div>
-                                    <label className="block text-gray-400 mb-2">Amount</label>
+                                    <label className="block text-lightText-secondary dark:text-gray-400 mb-2">Amount</label>
                                     <input
                                         type="number"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
-                                        className="w-full bg-gray-700/50 text-white px-4 py-2 rounded-lg"
+                                        className="w-full bg-white dark:bg-gray-700/50 text-lightText-primary dark:text-white border border-gray-300 dark:border-transparent px-4 py-2 rounded-lg"
                                         placeholder="Enter amount"
-                                        step="0.00000001"
+                                        min="0"
+                                        step="any"
                                         required
                                     />
                                 </div>
 
-                                {/* Total Cost Display */}
-                                {selectedCrypto && amount > 0 && (
-                                    <div className="bg-gray-700/50 p-4 rounded-lg">
+                                {/* Total Cost/Value Display */}
+                                {selectedCrypto && amount && (
+                                    <div className="p-4 bg-lightMode-secondary/50 dark:bg-gray-700/50 rounded-lg">
                                         <div className="flex justify-between mb-2">
-                                            <span>Price per coin:</span>
-                                            <span>£{currentPrice?.toFixed(2)}</span>
+                                            <span className="text-lightText-secondary dark:text-gray-400">Price per unit:</span>
+                                            <span>£{currentPrice?.toFixed(2) || '0.00'}</span>
                                         </div>
                                         <div className="flex justify-between font-bold">
-                                            <span>Total {tradeType === 'BUY' ? 'Cost' : 'Received'}:</span>
+                                            <span>Total {tradeType === 'BUY' ? 'Cost' : 'Value'}:</span>
                                             <span>£{totalCost.toFixed(2)}</span>
                                         </div>
                                     </div>
                                 )}
 
                                 {/* Error and Success Messages */}
-                                {error && (
-                                    <div className="bg-red-500/50 text-white p-4 rounded-lg">
-                                        {error}
-                                    </div>
-                                )}
-                                {success && (
-                                    <div className="bg-green-500/50 text-white p-4 rounded-lg">
-                                        {success}
-                                    </div>
-                                )}
+                                {error && <div className="text-red-600 dark:text-red-500 p-3 bg-red-100 dark:bg-red-900/20 rounded">{error}</div>}
+                                {success && <div className="text-green-600 dark:text-green-500 p-3 bg-green-100 dark:bg-green-900/20 rounded">{success}</div>}
 
                                 {/* Submit Button */}
                                 <button
                                     type="submit"
-                                    className={`w-full py-3 rounded-lg ${
+                                    className={`w-full py-3 rounded-lg font-bold ${
                                         tradeType === 'BUY'
                                             ? 'bg-green-600 hover:bg-green-700'
                                             : 'bg-red-600 hover:bg-red-700'
-                                    } text-white font-bold`}
+                                    } text-white transition-colors duration-200`}
                                 >
-                                    {tradeType} {selectedCrypto && amount ? `${amount} ${cryptocurrencies.find(c => c.id === selectedCrypto)?.symbol.toUpperCase()}` : 'Cryptocurrency'}
+                                    {tradeType} Cryptocurrency
                                 </button>
                             </form>
                         </div>
