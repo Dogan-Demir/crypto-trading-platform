@@ -85,12 +85,12 @@ export default function SupportTicket() {
                          backgroundSize: 'cover'
                      }}>
                     <div className="p-8">
-                        <h1 className="text-[40px] mb-6">Support Ticket</h1>
+                    <h1 className={`text-[40px] mb-6 ${isDarkMode ? 'text-white' : 'text-black'}`}>Support Ticket</h1>
 
                         {error && <p className="text-red-500 text-lg mb-2">{error}</p>}
                         {success && <p className="text-green-500 text-lg mb-2">{success}</p>}
 
-                        <form onSubmit={handleTicket} className="grid items-center w-[933px] border rounded-lg space-y-4 p-4">
+                        <form onSubmit={handleTicket} className="grid items-center w-[933px] border rounded-lg space-y-4 p-4 bg-white">
                             <div>
                                 <label className="block mb-2 ml-2 text-[25px]">Subject</label>
                                 <input 
@@ -129,7 +129,7 @@ export default function SupportTicket() {
 
                         {/* Display Tickets */}
                         <div className="mt-8 w-[933px]">
-                            <h2 className="text-[30px] mb-4">Submitted Tickets</h2>
+                        <h2 className={`text-[30px] mb-6 ${isDarkMode ? 'text-white' : 'text-black'}`}>Submitted Tickets</h2>
                             {ticket.length === 0 ? (
                                 <p className="text-gray-500 text-[25px]">No tickets submitted yet</p>
                             ) : (
