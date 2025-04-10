@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavBar2 from "./NavBar2";
 import bgImage from "./assets/Background-dark.png";
 import { useTheme } from './ThemeContext';
-
+// 
 export default function SupportTicket() {
     const { isDarkMode } = useTheme();
     const [ticket, setTicket] = useState([]);
